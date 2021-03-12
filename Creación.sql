@@ -159,7 +159,7 @@ CREATE TABLE Sucursal_objtab OF Sucursal_objtyp (
 /**GERENTE**/
 CREATE TYPE Gerente_objtyp UNDER Usuario_objtyp(
 	numero_gerente varchar(10),
-	salario number(6, 6),
+	salario number(12, 2),
 	turno varchar(10),
 	extension number,
 	overriding member procedure print
@@ -200,7 +200,7 @@ CREATE TABLE TipoEmpleado_objtab OF TipoEmpleado_objtyp(
 CREATE TYPE Empleado_objtyp UNDER Usuario_objtyp(
 	numero_empleado varchar(10),
 	extension number,
-	salario number(6, 6),
+	salario number(12, 2),
 	turno varchar(20),
 	tipo REF TipoEmpleado_objtyp,
 	overriding member procedure print
@@ -233,8 +233,8 @@ CREATE TABLE Empleado_objtab OF Empleado_objtyp(
 /**TIPO CUENTO**/
 CREATE TYPE TipoCuenta_objtyp AS OBJECT(
 	tipo varchar(20),
-	interes number(6, 6),
-	comision number(6, 6)
+	interes number(12, 2),
+	comision number(12, 2)
 
 );
 
@@ -244,21 +244,24 @@ CREATE TABLE TipoCuenta_objtab OF TipoCuenta_objtyp(
 	check(interes is not null),
 	check(interes > 0),
 	check(comision is not null),
-	check(comision > 0),
+	check(comision > 0)
 );
 /**MOVIMIENTO**/
-CREATE TYPE Movimiento_objtyp AS OBJECT(
+create or replace TYPE Movimiento_objtyp AS OBJECT(
 	numero_mov varchar(20),
-	fecha_hora datetime,
+	fecha_hora timestamp ,
 	concepto varchar(50),
-	cargo number(10),
-	saldo number(6, 6),
+	cargo number(12, 2),
+	saldo number(12, 2),
+	tipo_trans REF Transferencia_objtab,
+	tipo_pres1 REF Prestamo_objtab,
+	tipo_pres2 REF Prestamo_objtab,
+	tipo_inv REF Inversion_objtab,
 	map member function get_numero_mov return CHAR,
 	member procedure print,
 	member function ordenar (v_movimientos in Movimiento_objtyp) return integer
 
 );
-
 create or replace type body Movimiento_objtyp as 
 	map member function get_numero_mov return CHAR is
 	BEGIN
@@ -280,11 +283,11 @@ create or replace type body Movimiento_objtyp as
 	member function ordenar (v_movimientos in Movimiento_objtyp) return
 	 integer is 
 	 	BEGIN 
-		 if v_movimientos.numero_mov < self.numero_mov then 
-		 	DBMS_OUTPUT.PUT_LINE('numero mayor.');
+		 if v_movimientos.fecha_hora < self.fecha_hora then 
+		 	DBMS_OUTPUT.PUT_LINE('Fecha mayor.');
 			return 1;
 		else 
-			DBMS_OUTPUT.PUT_LINE('numero menor.');
+			DBMS_OUTPUT.PUT_LINE('Fecha menor.');
 			return 0;
 	end if;
 	END;
@@ -297,24 +300,65 @@ CREATE TABLE Movimiento_objtab OF Movimiento_objtyp(
 	check(cargo is not null),
 	check(cargo > 0),
 	check(saldo is not null),
-	check(saldo > 0)
+	check(saldo > 0),
+	SCOPE FOR(tipo_trans) IS Transferencia_objtab,
+	SCOPE FOR(tipo_pres1) IS Prestamo_objtab,
+	SCOPE FOR(tipo_pres2) IS Prestamo_objtab,
+	SCOPE FOR(tipo_inv) IS Inversion_objtab,
+	check(tipo_trans IS NULL),
+	check(tipo_pres1 IS NULL),
+	check(tipo_pres2 IS NULL),
+	check(tipo_inv IS NULL)
+
+
 );
 CREATE TYPE Movimiento_ntabtyp AS TABLE OF REF Movimiento_objtyp;
 /**CLIENTE**/
 CREATE TYPE Cliente_objtyp UNDER Usuario_objtyp(numero_cliente varchar(10));
 CREATE TABLE Cliente_objtab OF Cliente_objtyp(
 	numero_cliente unique,
-	check(numero_cliente is not null),
+	check(numero_cliente is not null)
 );
 /**CUENTA**/
 CREATE TYPE Cuenta_objtyp AS OBJECT (
 	numCuenta number(20),
 	fecha_Contrato date,
-	saldo number(6, 6),
+	saldo number(12,2),
 	tipocuenta REF TipoCuenta_objtyp,
 	movimientos Movimiento_ntabtyp,
-	cliente REF Cliente_objtyp
+	cliente REF Cliente_objtyp,
+	map member function get_numCuenta return CHAR,
+	member procedure print,
+	member function ordenar (v_cuenta in Cuenta_objtyp) return integer
+
 );
+create or replace type body Cuenta_objtyp as 
+	map member function get_numCuenta return CHAR is
+	BEGIN
+		return self.numCuenta;
+	END get_numCuenta;
+	member procedure print IS
+	BEGIN
+		DBMS_OUTPUT.PUT ('Cuenta');
+		DBMS_OUTPUT.PUT ('Numero: '||numCuenta);
+		DBMS_OUTPUT.PUT ('Fecha de contrato: '||fecha_Contrato );
+		DBMS_OUTPUT.PUT ('Saldo: '||saldo );
+		DBMS_OUTPUT.NEW_LINE;
+	END print;
+	member function ordenar (v_cuenta in Cuenta_objtyp) return
+	 integer is 
+	 	BEGIN 
+		 if v_cuenta.numCuenta < self.numCuenta then 
+		 	DBMS_OUTPUT.PUT_LINE('Numero de cuenta mayor.');
+			return 1;
+		else 
+			DBMS_OUTPUT.PUT_LINE('Numero de cuenta menor.');
+			return 0;
+	end if;
+	END;
+	
+END;
+
 CREATE TABLE Cuenta_objtab OF Cuenta_objtyp(
 	numCuenta PRIMARY KEY,
 	check(fecha_Contrato is not null),
@@ -324,13 +368,49 @@ CREATE TABLE Cuenta_objtab OF Cuenta_objtyp(
 	SCOPE FOR(cliente) IS Cliente_objtab
 ) NESTED TABLE movimientos STORE AS Movimiento_ntab;
 CREATE TYPE Cuenta_ntabtyp AS TABLE OF REF Cuenta_objtyp;
+
 /**OPERACION**/
 CREATE TYPE Operacion_objtyp AS OBJECT(
 	id number(10),
-	fecha date,
+	fecha timestamp,
 	estado varchar(20),
-	saldo_op number(6, 6)
+	saldo_op number(12, 2),
+	map member function get_id return CHAR,
+	member procedure print,
+	member procedure cambiarEstado(estado_O IN VARCHAR2),
+	member function ordenar (v_operacion in Operacion_objtyp) return integer
 ) NOT FINAL;
+
+create or replace type body Operacion_objtyp as 
+	map member function get_id return CHAR is
+	BEGIN
+		return self.id;
+	END get_id;
+	member procedure print IS
+	BEGIN
+		DBMS_OUTPUT.PUT ('Operacion');
+		DBMS_OUTPUT.PUT ('Fecha: '||fecha );
+		DBMS_OUTPUT.PUT ('Estado: '||estado );
+		DBMS_OUTPUT.PUT ('Saldo de la operación: '||saldo_op );
+		DBMS_OUTPUT.NEW_LINE;
+	END print;
+	member procedure cambiarEstado (estado_O IN VARCHAR2) IS
+    BEGIN
+    	self.estado := estado_O;
+    END cambiarEstado;
+	member function ordenar (v_operacion in Operacion_objtyp) return
+	 integer is 
+	 	BEGIN 
+		 if v_operacion.id < self.id then 
+		 	DBMS_OUTPUT.PUT_LINE('Id mayor.');
+			return 1;
+		else 
+			DBMS_OUTPUT.PUT_LINE('Id menor.');
+			return 0;
+	end if;
+	END;
+END;
+
 CREATE TABLE Operacion_objtab OF Operacion_objtyp(
 	id PRIMARY KEY,
 	check(fecha is not null),
@@ -346,8 +426,24 @@ CREATE TYPE Inversion_objtyp UNDER Operacion_objtyp(
 	nombre_fondo varchar(20),
 	riesgo varchar(20),
 	categoria varchar(20),
-	gerente REF Gerente_objtyp
+	gerente REF Gerente_objtyp,
+	overriding member procedure print
+
 );
+create or replace type body Inversion_objtyp as 
+	
+	overriding member procedure print IS
+	BEGIN
+		DBMS_OUTPUT.PUT ('Inversion');
+		DBMS_OUTPUT.PUT ('Nombre de fondo: '||nombre_fondo );
+		DBMS_OUTPUT.PUT ('Riesgo: '||riesgo);
+		DBMS_OUTPUT.PUT ('Categoria: '|| categoria );
+		DBMS_OUTPUT.NEW_LINE;
+	END print;
+	
+
+END;
+
 CREATE TABLE Inversion_objtab OF Inversion_objtyp(
 	check(nombre_fondo is not null),
 	check(riesgo is not null),
@@ -358,8 +454,19 @@ CREATE TABLE Inversion_objtab OF Inversion_objtyp(
 CREATE TYPE Prestamo_objtyp UNDER Operacion_objtyp(
 	finalidad varchar(40),
 	plazo date,
-	empleado REF Empleado_objtyp
+	empleado REF Empleado_objtyp,
+	overriding member procedure print
 );
+create or replace type body Prestamo_objtyp as 
+	
+	overriding member procedure print IS
+	BEGIN
+		DBMS_OUTPUT.PUT ('Prestamo');
+		DBMS_OUTPUT.PUT ('Finalidad: '||finalidad );
+		DBMS_OUTPUT.PUT ('Date: '||plazo);
+		DBMS_OUTPUT.NEW_LINE;
+	END print;
+END;
 CREATE TABLE Prestamo_objtab OF Prestamo_objtyp(
 	check(finalidad is not null),
 	check(plazo is not null),
@@ -369,8 +476,21 @@ CREATE TABLE Prestamo_objtab OF Prestamo_objtyp(
 CREATE TYPE Transferencia_objtyp UNDER Operacion_objtyp(
 	tipo varchar(40),
 	concepto varchar(50),
-	beneficiario number(15)
+	beneficiario number(15),
+	overriding member procedure print
+
 );
+create or replace type body Transferencia_objtyp as 
+	
+	overriding member procedure print IS
+	BEGIN
+		DBMS_OUTPUT.PUT ('Transferencia');
+		DBMS_OUTPUT.PUT ('Tipo: '||tipo );
+		DBMS_OUTPUT.PUT ('Concepto: '||concepto);
+		DBMS_OUTPUT.PUT ('Beneficiario: '||beneficiario);
+		DBMS_OUTPUT.NEW_LINE;
+	END print;
+END;
 CREATE TABLE Transferencia_objtab OF Transferencia_objtyp(
 	check(tipo is not null),
 	check (UPPER(tipo) in ('EXTERIOR', 'NACIONAL')),
@@ -380,19 +500,52 @@ CREATE TABLE Transferencia_objtab OF Transferencia_objtyp(
 /**MOVIMIENTO TARJETA**/
 CREATE TYPE MovimientoTarjeta_objtyp AS OBJECT(
 	numero_movt varchar(20),
-	fecha_hora date,
+	fecha_hora timestamp,
 	concepto varchar(50),
 	cargo number(10),
-	mensualidad number(6, 6)
+	mensualidad number(12, 2),
+	map member function get_numero_movt return CHAR,
+	member procedure print,
+	member function ordenar (v_movimientoT in MovimientoTarjeta_objtyp) return integer
 );
+
+create or replace type body MovimientoTarjeta_objtyp as 
+	map member function get_numero_movt return CHAR is
+	BEGIN
+		return self.numero_movt;
+	END get_numero_movt;
+	member procedure print IS
+	BEGIN
+		DBMS_OUTPUT.PUT ('Movimiento Tarjeta');
+		DBMS_OUTPUT.PUT ('Fecha: '||fecha_hora);
+		DBMS_OUTPUT.PUT ('Concepto: '||concepto );
+		DBMS_OUTPUT.PUT ('Cargo: '||cargo );
+		DBMS_OUTPUT.PUT ('Mensualidad: '||mensualidad );
+		DBMS_OUTPUT.NEW_LINE;
+	END print;
+	
+	member function ordenar (v_movimientoT in MovimientoTarjeta_objtyp) return
+	 integer is 
+	 	BEGIN 
+		 if v_movimientoT.fecha_hora < self.fecha_hora then 
+		 	DBMS_OUTPUT.PUT_LINE('Fecha mayor.');
+			return 1;
+		else 
+			DBMS_OUTPUT.PUT_LINE('Fecha menor.');
+			return 0;
+	end if;
+	END;
+END;
+
 CREATE TYPE MovimientoTarjeta_ntabtyp AS TABLE OF REF Movimiento_objtyp;
-CREATE TABLE MovimientoTarjeta_objtab AS OF MovimientoTarjeta_objtyp(
+CREATE TABLE MovimientoTarjeta_objtab OF MovimientoTarjeta_objtyp(
 	numero_movt PRIMARY KEY,
 	check(fecha_hora is not null),
 	check(concepto is not null),
 	check(cargo is not null),
 	check(cargo > 0),
 	check(mensualidad is not null)
+	
 );
 /**TARJETA**/
 CREATE TYPE Tarjeta_objtyp AS OBJECT(
@@ -401,8 +554,40 @@ CREATE TYPE Tarjeta_objtyp AS OBJECT(
 	CVV number(3),
 	tipo varchar(20),
 	cuenta REF Cuenta_objtyp,
-	movimientos MovimientoTarjeta_ntabtyp
+	movimientos MovimientoTarjeta_ntabtyp,
+	map member function get_numTarjeta return CHAR,
+	member procedure print,
+	member function ordenar (v_tarjeta in Tarjeta_objtyp) return integer
+
 );
+create or replace type body Tarjeta_objtyp as 
+	map member function get_numTarjeta return CHAR is
+	BEGIN
+		return self.numTarjeta;
+	END get_numTarjeta;
+	member procedure print IS
+	BEGIN
+		DBMS_OUTPUT.PUT ('Tarjeta');
+		DBMS_OUTPUT.PUT ('Numero Tarjeta: '||numTarjeta);
+		DBMS_OUTPUT.PUT ('Fecha de caducidad: '||fecha_Caducidad);
+		DBMS_OUTPUT.PUT ('CVV: '||CVV );
+		DBMS_OUTPUT.PUT ('Tipo: '||tipo );
+		DBMS_OUTPUT.NEW_LINE;
+	END print;
+	
+	member function ordenar (v_tarjeta in Tarjeta_objtyp) return
+	 integer is 
+	 	BEGIN 
+		 if v_tarjeta.fecha_Caducidad < self.fecha_Caducidad then 
+		 	DBMS_OUTPUT.PUT_LINE('Fecha mayor.');
+			return 1;
+		else 
+			DBMS_OUTPUT.PUT_LINE('Fecha menor.');
+			return 0;
+	end if;
+	END;
+END;
+
 CREATE TABLE Tarjeta_objtab OF Tarjeta_objtyp(
 	numTarjeta PRIMARY KEY,
 	check(fecha_Caducidad is not null),
