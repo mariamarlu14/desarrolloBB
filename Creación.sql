@@ -408,7 +408,7 @@ CREATE TABLE Prestamo_objtab OF Prestamo_objtyp(
 	check(finalidad is not null),
 	check(plazo is not null),
 	SCOPE FOR(empleado) IS Empleado_objtab
-);
+	);
 
 
 /**Tipo TRANSFERENCIA**/
@@ -440,6 +440,7 @@ CREATE TABLE Transferencia_objtab OF Transferencia_objtyp(
 	check (UPPER(tipo) in ('EXTERIOR', 'NACIONAL')),
 	check(concepto is not null),
 	check(beneficiario is not null)
+
 );
 
 
@@ -484,16 +485,7 @@ create or replace type body MovimientoTarjeta_objtyp as
 	END;
 END;
 
-/**Tabla MOVIMIENTOTARJETA**/
-CREATE TABLE MovimientoTarjeta_objtab OF MovimientoTarjeta_objtyp(
-	numero_movt PRIMARY KEY,
-	check(fecha_hora is not null),
-	check(concepto is not null),
-	check(cargo is not null),
-	check(cargo > 0),
-	check(mensualidad is not null)
-	
-);
+
 
 
 /**Tipo MOVIMIENTO**/
@@ -503,10 +495,7 @@ create or replace TYPE Movimiento_objtyp AS OBJECT(
 	concepto varchar(50),
 	cargo number(12, 2),
 	saldo number(12, 2),
-	tipo_trans REF Transferencia_objtyp,
-	tipo_pres1 REF Prestamo_objtyp,
-	tipo_pres2 REF Prestamo_objtyp,
-	tipo_inv REF Inversion_objtyp,
+
 	map member function get_numero_mov return CHAR,
 	member procedure print,
 	member function ordenar (v_movimientos in Movimiento_objtyp) return integer
@@ -514,9 +503,9 @@ create or replace TYPE Movimiento_objtyp AS OBJECT(
 );
 
 /**Tabla anidada para TARJETA**/
-CREATE TYPE MovimientoTarjeta_ntabtyp AS TABLE OF REF Movimiento_objtyp;
+CREATE TYPE MovimientoTarjeta_ntabtyp AS TABLE OF MovimientoTarjeta_objtyp;
 /**Tabla anidada para CUENTA**/
-CREATE TYPE Movimiento_ntabtyp AS TABLE OF REF Movimiento_objtyp;
+CREATE TYPE Movimiento_ntabtyp AS TABLE OF Movimiento_objtyp;
 
 /**Funcion getNumeroMov, print, ordenar**/
 create or replace type body Movimiento_objtyp as 
@@ -550,7 +539,8 @@ create or replace type body Movimiento_objtyp as
 	END;
 END;
 
-/**Tabla MOVIMIENTO**/
+/*
+Tabla MOVIMIENTO
 CREATE TABLE Movimiento_objtab OF Movimiento_objtyp(
 	numero_mov PRIMARY KEY,
 	check(fecha_hora is not null),
@@ -564,7 +554,7 @@ CREATE TABLE Movimiento_objtab OF Movimiento_objtyp(
 	SCOPE FOR(tipo_pres2) IS Prestamo_objtab,
 	SCOPE FOR(tipo_inv) IS Inversion_objtab
 );
-
+*/
 
 /**Tipo CUENTA**/
 CREATE TYPE Cuenta_objtyp AS OBJECT (
@@ -616,8 +606,23 @@ CREATE TABLE Cuenta_objtab OF Cuenta_objtyp(
 	check(saldo > 0),
 	SCOPE FOR(tipocuenta) IS TipoCuenta_objtab,
 	SCOPE FOR(cliente) IS Cliente_objtab
-) NESTED TABLE movimientos STORE AS Movimiento_ntab;
+) NESTED TABLE movimientos STORE AS Movimiento_ntab(
+	(	
+	numero_mov PRIMARY KEY,
+	check(fecha_hora is not null),
+	check(concepto is not null),
+	check(cargo is not null),
+	check(cargo > 0),
+	check(saldo is not null),
+	check(saldo > 0)
+	
+)
+);
 
+ALTER TABLE movimiento_ntab ADD (SCOPE FOR (tipo_trans) IS transferencia_objtab);
+ALTER TABLE movimiento_ntab ADD (SCOPE FOR (tipo_pres1) IS prestamo_objtab);
+ALTER TABLE movimiento_ntab ADD (SCOPE FOR (tipo_pres2) IS prestamo_objtab);
+ALTER TABLE movimiento_ntab ADD (SCOPE FOR (tipo_inv) IS inversion_objtab);
 
 
 /**Tipo TARJETA**/
@@ -670,11 +675,21 @@ CREATE TABLE Tarjeta_objtab OF Tarjeta_objtyp(
 	check(tipo is not null),
 	check (UPPER(tipo) in ('CREDITO', 'DEBITO')),
 	SCOPE FOR(cuenta) IS Cuenta_objtab
-) NESTED TABLE movimientos STORE AS MovimientoTarjeta_ntab;
+) NESTED TABLE movimientos STORE AS MovimientoTarjeta_ntab(
+	(
+		numero_movt PRIMARY KEY,
+	check(fecha_hora is not null),
+	check(concepto is not null),
+	check(cargo is not null),
+	check(cargo > 0),
+	check(mensualidad is not null)
+	)
+);
 
 
 
 
+--CREATE TYPE Prestamo_ntabtyp AS TABLE OF REF Prestamo_objtyp;
 
 
 /**SIN PONER**/

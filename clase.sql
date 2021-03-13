@@ -1,3 +1,5 @@
+/*BLOG DE TOMÁS: http://blog.uclm.es/tomasrojo/2016/04/13/ref-tab-anidada/*/
+
 CREATE OR REPLACE TYPE PRODUCTOS_OBJTYP AS OBJECT
 ( NP NUMBER(6),
 DESCRIP VARCHAR2(20),
