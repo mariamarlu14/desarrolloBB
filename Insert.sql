@@ -69,7 +69,7 @@ INSERT INTO Empleado_objtab values(
 
 INSERT INTO Empleado_objtab values(
     Empleado_objtyp(
-    '82730198L', 'Miguel Navarro Espinosa', 615982567, TO_DATE('11/11/1972','dd/mm/yyyy'), 'C/Montesol', 7, 'Ciudad Real',13701, empleado_idempleado_seq.nextval, 1330, 3002 ,'MAÑANA', 
+    '82730298L', 'Miguel Navarro Espinosa', 615982567, TO_DATE('11/11/1972','dd/mm/yyyy'), 'C/Montesol', 7, 'Ciudad Real',13701, empleado_idempleado_seq.nextval, 1330, 3002 ,'MAÑANA', 
     (SELECT ref(t)
     FROM TipoEmpleado_objtab t
     WHERE tipo = 'CONTABLE')));
@@ -180,7 +180,7 @@ INSERT INTO Movimiento_objtab VALUES(
 
 INSERT INTO Movimiento_objtab VALUES(
     Movimiento_objtyp(
-        movimiento_idmovimiento_seq.nextval,TO_TIMESTAMP ('02-Dic-20 25:03:30.123000', 'DD-Mon-RR HH24:MI:SS.FF'), 'Pago agua', 25, 16000,
+        movimiento_idmovimiento_seq.nextval,TO_TIMESTAMP ('02-Dic-20 13:03:30.123000', 'DD-Mon-RR HH24:MI:SS.FF'), 'Pago agua', 25, 16000,
     (SELECT ref(o)
     FROM Transferencia_objtab o
     WHERE o.id = 2),
@@ -206,7 +206,7 @@ INSERT INTO Movimiento_objtab VALUES(
 
 INSERT INTO Movimiento_objtab VALUES(
     Movimiento_objtyp(
-        movimiento_idmovimiento_seq.nextval,TO_TIMESTAMP ('25-Nov-20 11:32:30.123000', 'DD-Mon-RR HH24:MI:SS.FF'), 'Prestamo casa pagar', -100, 16000,
+        movimiento_idmovimiento_seq.nextval,TO_TIMESTAMP ('25-Nov-20 11:32:30.123000', 'DD-Mon-RR HH24:MI:SS.FF'), 'Prestamo casa pagar', 100, 16000,
         NULL, NULL, (SELECT ref(o)
         FROM Prestamo_objtab o
         WHERE o.id = 2),NULL
