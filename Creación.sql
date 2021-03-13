@@ -106,8 +106,7 @@ CREATE TABLE Usuario_objtab OF Usuario_objtyp (
 	check(calle is not null),
 	check(numero is not null),
 	check(localidad is not null),
-	check(codigo_postal is not null),
-	dni unique
+	check(codigo_postal is not null)
 );
 
 
@@ -200,6 +199,7 @@ END;
 
 /**Tabla GERENTE**/
 CREATE TABLE Gerente_objtab OF Gerente_objtyp(
+	dni PRIMARY KEY,
 	check(numero_gerente is not null),
 	numero_gerente unique,
 	check(salario is not null),
@@ -250,6 +250,7 @@ END;
 
 /**Tabla EMPLEADO**/
 CREATE TABLE Empleado_objtab OF Empleado_objtyp(
+	dni PRIMARY KEY,
 	check(numero_empleado is not null),
 	numero_empleado unique,
 	check(extension is not null),
@@ -287,6 +288,7 @@ CREATE TYPE Cliente_objtyp UNDER Usuario_objtyp(numero_cliente varchar(10));
 
 /**Tabla CLIENTE**/
 CREATE TABLE Cliente_objtab OF Cliente_objtyp(
+	dni PRIMARY KEY,
 	numero_cliente unique,
 	check(numero_cliente is not null)
 );
@@ -372,6 +374,7 @@ END;
 
 /**Tabla INVERSION**/
 CREATE TABLE Inversion_objtab OF Inversion_objtyp(
+	id PRIMARY KEY,
 	check(nombre_fondo is not null),
 	check(riesgo is not null),
 	check(categoria is not null),
@@ -401,6 +404,7 @@ END;
 
 /**Tabla PRESTAMO**/
 CREATE TABLE Prestamo_objtab OF Prestamo_objtyp(
+	id PRIMARY KEY,
 	check(finalidad is not null),
 	check(plazo is not null),
 	SCOPE FOR(empleado) IS Empleado_objtab
@@ -431,6 +435,7 @@ END;
 
 /**Tabla TRANSFERENCIA**/
 CREATE TABLE Transferencia_objtab OF Transferencia_objtyp(
+	id PRIMARY KEY,
 	check(tipo is not null),
 	check (UPPER(tipo) in ('EXTERIOR', 'NACIONAL')),
 	check(concepto is not null),
