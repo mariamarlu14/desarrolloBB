@@ -25,17 +25,34 @@ CREATE OR REPLACE VIEW Prestamo_no_iniciado AS
 
 /*Informacion de una cuenta que muestre los movimientos*/
 
-CREATE OR REPLACE VIEW Info_Cuenta_Movimientos ("NUMERO_CUENTA", "FECHA_CONTRATO", "SALDO", "TIPO_CUENTA", "MOVIMIENTOS") AS
-SELECT mov.numero_mov, mov.fecha_hora, mov.concepto, mov.cargo
-FROM Movimiento_objtab mov
-WHERE mov.numero_mov IN (SELECT cu.numero_cuenta, cu.fecha_contraro, cu.saldo, cu.tipo_cuenta FROM Cuenta_objtab cu WHERE )
 
 
-CREATE OR REPLACE VIEW Info_Cuenta_Movimientos() AS;
+CREATE OR REPLACE VIEW Datos_Cuenta_Movimiento ("NUMERO_CUENTA", "FECHA_CONTRATO", "SALDO", "MOVIMIENTOS")  AS
+Select C.NumCuenta,C.Fecha_Contrato, C.Saldo, (INFOMovimiento(C.NumCuenta)) AS DATOS
+FROM cuenta_objtab C;
+
+create or replace FUNCTION getmov (numCuenta1 IN VARCHAR2)
+    RETURN Movimiento_NTABTYP AS mv Movimiento_NTABTYP;
     BEGIN
-        SELECT cu.numCuenta, mov.numero_mov, mov.fecha_hora, mov.concepto, mov.cargo
-        INTO Movimiento_objtab mov, (SELECT numCuenta FROM Cuenta_objtab WHERE numero_cuenta == cu.numCuenta) cu;
-        
+        SELECT Cu.movimientos INTO mv FROM Cuenta_objtab Cu WHERE Cu.numCuenta = numCuenta1;
+    RETURN mv;
+END getmov;
+
+create or replace FUNCTION INFOMovimiento(numCuenta1 IN VARCHAR2) RETURN VARCHAR2 AS TEXTO VARCHAR2(30000);
+Mv Movimiento_NTABTYP;
+aux Transferencia_objtyp;
+    BEGIN
+        Mv := getmov(numCuenta1);
+        FOR I IN Mv.FIRST..Mv.LAST LOOP
+            SELECT DEREF(Mv(I).Tipo_trans)
+            INTO aux
+                FROM DUAL; TEXTO := TEXTO || (CHR(13) || CHR(9) || ' Num: ' || Mv(I).numero_mov || ' Fecha y hora: ' || Mv(I).fecha_hora || ' Concepto: ' || Mv(I).concepto || ' Saldo: ' || Mv(I).saldo ||'---' );
+            END LOOP;
+    RETURN TEXTO;
+END;
+
+
+
 
 /*CREATE OR REPLACE VIEW PART_FED_MAYOR_MEDALLERO ("NOMBRE", "APELLIDOS", "TELEFONO", "EMAIL") AS
 SELECT part.Nombre, part.apellidos, part.Telefono, part.email

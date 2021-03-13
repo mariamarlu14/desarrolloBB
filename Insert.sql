@@ -107,59 +107,6 @@ INSERT INTO TipoCuenta_objtab VALUES(
     TipoCuenta_objtyp('PENSIONISTA', 0.2, 0.03));
 
 
-
-/*CUENTA*/
-
-INSERT INTO Cuenta_objtab VALUES(
-    Cuenta_objtyp(
-    cuenta_idcuenta_seq.nextval, TO_DATE('24/03/2020','dd/mm/yyyy'), 28394, 
-    (SELECT ref(t) FROM TipoCuenta_objtab t WHERE tipo = 'JOVEN'),
-    Movimiento_ntabtyp(Movimiento_objtyp(
-        movimiento_idmovimiento_seq.nextval,TO_TIMESTAMP ('14-Sep-20 02:37:30.123000', 'DD-Mon-RR HH24:MI:SS.FF'), 'Inversion Ibex 35', 400, 16000,
-        NULL, NULL, NULL,
-        (SELECT ref(o)
-         FROM Inversion_objtab o
-        WHERE o.id = 1),
-    Movimiento_objtyp(
-        movimiento_idmovimiento_seq.nextval,TO_TIMESTAMP ('02-Dic-20 13:03:30.123000', 'DD-Mon-RR HH24:MI:SS.FF'), 'Pago agua', 25, 16000,
-        (SELECT ref(o)
-        FROM Transferencia_objtab o
-        WHERE o.id = 2),
-        NULL, NULL, NULL
-        )
-        )), 
-        (SELECT ref(u) FROM Cliente_objtab u WHERE u.dni = '27212721F')));
-
-INSERT INTO Cuenta_objtab VALUES(
-    Cuenta_objtyp(
-    cuenta_idcuenta_seq.nextval, TO_DATE('21/11/2020','dd/mm/yyyy'), 25548, 
-    (SELECT ref(t) FROM TipoCuenta_objtab t WHERE tipo = 'ADULTO'),
-    Movimiento_ntabtyp(Movimiento_objtyp(
-        movimiento_idmovimiento_seq.nextval,TO_TIMESTAMP ('03-Dic-20 12:37:30.123000', 'DD-Mon-RR HH24:MI:SS.FF'), 'Prestamo casa', 400, 16000,
-        NULL,(SELECT ref(o)
-        FROM Prestamo_objtab o
-        WHERE o.id = 1), NULL, NULL
-    )), 
-    (SELECT ref(u) FROM Cliente_objtab u WHERE u.dni = '28349273A')));
-
-INSERT INTO Cuenta_objtab VALUES(
-    Cuenta_objtyp(
-    cuenta_idcuenta_seq.nextval, TO_DATE('24/03/2020','dd/mm/yyyy'), 88544, 
-    (SELECT ref(t) FROM TipoCuenta_objtab t WHERE tipo = 'PENSIONISTA'),
-    Movimiento_ntabtyp( Movimiento_objtyp(
-        movimiento_idmovimiento_seq.nextval,TO_TIMESTAMP ('25-Nov-20 11:32:30.123000', 'DD-Mon-RR HH24:MI:SS.FF'), 'Prestamo casa pagar', 100, 16000,
-        NULL, NULL, (SELECT ref(o)
-        FROM Prestamo_objtab o
-        WHERE o.id = 2),NULL
-    )),Movimiento_objtyp(
-        movimiento_idmovimiento_seq.nextval,TO_TIMESTAMP ('03-Dic-20 12:37:30.123000', 'DD-Mon-RR HH24:MI:SS.FF'), 'Pago luz', 30, 16000,
-    (SELECT ref(o)
-    FROM Transferencia_objtab o
-    WHERE o.id = 1),
-    NULL, NULL, NULL
-    ), 
-    (SELECT ref(u) FROM Cliente_objtab u WHERE u.dni = '92831029P')));
-
 /*OPERACIÓN TRANSFERENCIA*/
 
 
@@ -196,8 +143,63 @@ INSERT INTO Prestamo_objtab VALUES(
     FROM Empleado_objtab e
     WHERE e.numero_empleado = 1)));
     
+
+/*CUENTA*/
+
+INSERT INTO Cuenta_objtab VALUES(
+    Cuenta_objtyp(
+    cuenta_idcuenta_seq.nextval, TO_DATE('24/03/2020','dd/mm/yyyy'), 28394, 
+    (SELECT ref(t) FROM TipoCuenta_objtab t WHERE tipo = 'JOVEN'),
+    Movimiento_ntabtyp(Movimiento_objtyp(
+                        movimiento_idmovimiento_seq.nextval,TO_TIMESTAMP ('14-Sep-20 02:37:30.123000', 'DD-Mon-RR HH24:MI:SS.FF'), 'Inversion Ibex 35', 400, 16000,
+                        NULL, NULL, NULL,
+                        (SELECT ref(o)
+                        FROM Inversion_objtab o
+                        WHERE o.id = 1)),
+                    Movimiento_objtyp(
+                        movimiento_idmovimiento_seq.nextval,TO_TIMESTAMP ('02-Dic-20 13:03:30.123000', 'DD-Mon-RR HH24:MI:SS.FF'), 'Pago agua', 25, 16000,
+                        (SELECT ref(o)
+                        FROM Transferencia_objtab o
+                        WHERE o.id = 2),
+                        NULL, NULL, NULL)
+        ), 
+        (SELECT ref(u) FROM Cliente_objtab u WHERE u.dni = '27212721F')));
+
+INSERT INTO Cuenta_objtab VALUES(
+    Cuenta_objtyp(
+    cuenta_idcuenta_seq.nextval, TO_DATE('21/11/2020','dd/mm/yyyy'), 25548, 
+    (SELECT ref(t) FROM TipoCuenta_objtab t WHERE tipo = 'ADULTO'),
+    Movimiento_ntabtyp(Movimiento_objtyp(
+        movimiento_idmovimiento_seq.nextval,TO_TIMESTAMP ('03-Dic-20 12:37:30.123000', 'DD-Mon-RR HH24:MI:SS.FF'), 'Prestamo casa', 400, 16000,
+        NULL,(SELECT ref(o)
+        FROM Prestamo_objtab o
+        WHERE o.id = 25), NULL, NULL
+    ),
+    Movimiento_objtyp(
+       movimiento_idmovimiento_seq.nextval,TO_TIMESTAMP ('25-Nov-20 11:32:30.123000', 'DD-Mon-RR HH24:MI:SS.FF'), 'Prestamo casa pagar', 100, 16000,
+        NULL, NULL, (SELECT ref(o)
+        FROM Prestamo_objtab o
+        WHERE o.id = 26),NULL
+    )), 
+    (SELECT ref(u) FROM Cliente_objtab u WHERE u.dni = '28349273A')));
+
+INSERT INTO Cuenta_objtab VALUES(
+    Cuenta_objtyp(
+    cuenta_idcuenta_seq.nextval, TO_DATE('24/03/2020','dd/mm/yyyy'), 88544, 
+    (SELECT ref(t) FROM TipoCuenta_objtab t WHERE tipo = 'PENSIONISTA'),
+    Movimiento_ntabtyp( Movimiento_objtyp(
+        movimiento_idmovimiento_seq.nextval,TO_TIMESTAMP ('03-Dic-20 12:37:30.123000', 'DD-Mon-RR HH24:MI:SS.FF'), 'Pago luz', 30, 16000,
+    (SELECT ref(o)
+    FROM Transferencia_objtab o
+    WHERE o.id = 1),
+    NULL, NULL, NULL
+    )), 
+    (SELECT ref(u) FROM Cliente_objtab u WHERE u.dni = '92831029P')));
+
+
     
 /*MOVIMIENTO*/
+/*
 INSERT INTO Movimiento_objtab VALUES(
     Movimiento_objtyp(
         movimiento_idmovimiento_seq.nextval,TO_TIMESTAMP ('03-Dic-20 12:37:30.123000', 'DD-Mon-RR HH24:MI:SS.FF'), 'Pago luz', 30, 16000,
@@ -241,7 +243,7 @@ INSERT INTO Movimiento_objtab VALUES(
         WHERE o.id = 2),NULL
     ));
        
-
+*/
 
 /*MOVIMIENTO TARJETA*/
 
@@ -274,19 +276,9 @@ INSERT INTO Tarjeta_objtab VALUES(
     FROM Cuenta_objtab c
     WHERE c.numcuenta = 1),
     MovimientoTarjeta_ntabtyp(
-        movimientoTarjeta_idmovimientoTarjeta_seq.nextval, TO_TIMESTAMP ('13-Oct-20 11:37:30.123000', 'DD-Mon-RR HH24:MI:SS.FF'), 'Comprar Mercadona', 95.2, 1))));
-
-INSERT INTO Tarjeta_objtab VALUES(
-    Tarjeta_objtyp(
-    tarjeta_idtarjeta_seq.nextval, TO_DATE('04/10/2021','dd/mm/yyyy'), 456, 'CREDITO', 
-    (SELECT ref(c) 
-    FROM Cuenta_objtab c
-    WHERE c.numcuenta = 2),
-    MovimientoTarjeta_ntabtyp(
-        movimientoTarjeta_idmovimientoTarjeta_seq.nextval, TO_TIMESTAMP ('15-Oct-20 21:15:38.123000', 'DD-Mon-RR HH24:MI:SS.FF'), 'Compra Online', 25.9, 1)),
-        movimientoTarjeta_idmovimientoTarjeta_seq.nextval, TO_TIMESTAMP ('03-Oct-20 02:25:30.123000', 'DD-Mon-RR HH24:MI:SS.FF'), 'Pago Esteticien', 102.9, 1))
-
-    )));
+    movimientoTarjeta_objtyp(
+        movimientoTarjeta_idmovimientoTarjeta_seq.nextval,
+        TO_TIMESTAMP ('13-Oct-20 11:37:30.123000', 'DD-Mon-RR HH24:MI:SS.FF'), 'Comprar Mercadona', 95.2, 1))));
 
 INSERT INTO Tarjeta_objtab VALUES(
     Tarjeta_objtyp(
@@ -295,10 +287,25 @@ INSERT INTO Tarjeta_objtab VALUES(
     FROM Cuenta_objtab c
     WHERE c.numcuenta = 1),
     MovimientoTarjeta_ntabtyp(
-        movimientoTarjeta_idmovimientoTarjeta_seq.nextval, TO_TIMESTAMP ('05-Dic-20 18:31:30.123000', 'DD-Mon-RR HH24:MI:SS.FF'), 'Compra Mercadona', 155.2, 1)),
-        movimientoTarjeta_idmovimientoTarjeta_seq.nextval, TO_TIMESTAMP ('23-Dic-20 21:02:30.123000', 'DD-Mon-RR HH24:MI:SS.FF'), 'Compra Amazon', 10.2, 1))
-    )));
+     movimientoTarjeta_objtyp(
+        4, TO_TIMESTAMP ('05-Dic-20 18:31:30.123000', 'DD-Mon-RR HH24:MI:SS.FF'), 'Compra Mercadona', 155.2, 1),
+    movimientoTarjeta_objtyp(
+       5, TO_TIMESTAMP ('23-Dic-20 21:02:30.123000', 'DD-Mon-RR HH24:MI:SS.FF'), 'Compra Amazon', 10.2, 1))
+    ));
 
+INSERT INTO Tarjeta_objtab VALUES(
+    Tarjeta_objtyp(
+    tarjeta_idtarjeta_seq.nextval, TO_DATE('21/01/2022','dd/mm/yyyy'), 789, 'DEBITO', 
+    (SELECT ref(c) 
+    FROM Cuenta_objtab c
+    WHERE c.numcuenta = 1),
+    MovimientoTarjeta_ntabtyp(
+     movimientoTarjeta_objtyp(
+        movimientoTarjeta_idmovimientoTarjeta_seq.nextval, TO_TIMESTAMP ('05-Dic-20 18:31:30.123000', 'DD-Mon-RR HH24:MI:SS.FF'), 'Compra Mercadona', 155.2, 1),
+      movimientoTarjeta_objtyp(
+        movimientoTarjeta_idmovimientoTarjeta_seq.nextval, TO_TIMESTAMP ('23-Dic-20 21:02:30.123000', 'DD-Mon-RR HH24:MI:SS.FF'), 'Compra Amazon', 10.2, 1))
+    ));
+/*
 INSERT INTO Tarjeta_objtab VALUES(
     Tarjeta_objtyp(
     tarjeta_idtarjeta_seq.nextval, TO_DATE('14/09/2023','dd/mm/yyyy'), 147, 'DEBITO', 
@@ -307,4 +314,4 @@ INSERT INTO Tarjeta_objtab VALUES(
     WHERE c.numcuenta = 3),
     MovimientoTarjeta_ntabtyp()));
 
-
+*/
