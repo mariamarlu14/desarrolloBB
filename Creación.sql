@@ -97,6 +97,7 @@ END;
 
 
 /**Tabla USUARIO**/
+/*
 CREATE TABLE Usuario_objtab OF Usuario_objtyp (
 	dni PRIMARY KEY,
 	check(nombre is not null),
@@ -108,7 +109,7 @@ CREATE TABLE Usuario_objtab OF Usuario_objtyp (
 	check(localidad is not null),
 	check(codigo_postal is not null)
 );
-
+*/
 
 
 /**Tipo SUCURSAL**/
@@ -339,6 +340,7 @@ create or replace type body Operacion_objtyp as
 END;
 
 /**Tabla OPERACION**/
+/*
 CREATE TABLE Operacion_objtab OF Operacion_objtyp(
 	id PRIMARY KEY,
 	check(fecha is not null),
@@ -350,7 +352,7 @@ CREATE TABLE Operacion_objtab OF Operacion_objtyp(
 	check(saldo_op > 0)
 );
 
-
+*/
 
 
 /**Tipo MOVIMIENTO TARJETA**/
@@ -416,7 +418,8 @@ create or replace TYPE Movimiento_objtyp AS OBJECT(
 
 
 /**Tabla anidada para TARJETA**/
-CREATE TYPE MovimientoTarjeta_ntabtyp AS TABLE OF MovimientoTarjeta_objtyp;
+CREATE TYPE Movimientotarjeta_ntabtyp AS TABLE OF Movimientotarjeta_ntabtyp;
+
 /**Tabla anidada para CUENTA**/
 CREATE TYPE Movimiento_ntabtyp AS TABLE OF Movimiento_objtyp;
 
