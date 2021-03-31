@@ -2,6 +2,10 @@
 CREATE TYPE Banco_objtyp AS OBJECT(
 	cif char(10),
 	nombre varchar(10),
+	calle varchar(20),
+	numero number,
+	localidad char(20),
+	codigo_postal number(5),
 	map member function get_CIF return CHAR,
 	member procedure print,
 	member function ordenar (v_banco in Banco_objtyp) return integer
@@ -37,6 +41,10 @@ END;
 CREATE TABLE Banco_objtab OF Banco_objtyp (
 	cif PRIMARY KEY,
 	check (nombre is not null),
+	check(calle is not null),
+	check(numero is not null),
+	check(localidad is not null),
+	check(codigo_postal is not null),
 	nombre unique
 );
 
@@ -54,7 +62,7 @@ CREATE TYPE Usuario_objtyp AS OBJECT(
 	member procedure print,
 	member procedure cambiarTelefono(telefono_U IN VARCHAR2),
 	member function ordenar (v_usuarios in Usuario_objtyp) return integer
-) NOT FINAL;
+) NOT INSTANTIABLE  NOT FINAL;
 
 
 /**Tabla anidada para Sucursal **/
@@ -354,6 +362,97 @@ CREATE TABLE Operacion_objtab OF Operacion_objtyp(
 
 */
 
+/**Tipo INVERSION**/
+CREATE TYPE Inversion_objtyp UNDER Operacion_objtyp(
+	nombre_fondo varchar(20),
+	riesgo varchar(20),
+	categoria varchar(20),
+	gerente REF Gerente_objtyp,
+	overriding member procedure print
+);
+/**Funcion print**/
+create or replace type body Inversion_objtyp as 
+	
+	overriding member procedure print IS
+	BEGIN
+		DBMS_OUTPUT.PUT ('Inversion');
+		DBMS_OUTPUT.PUT ('Nombre de fondo: '||nombre_fondo );
+		DBMS_OUTPUT.PUT ('Riesgo: '||riesgo);
+		DBMS_OUTPUT.PUT ('Categoria: '|| categoria );
+		DBMS_OUTPUT.NEW_LINE;
+	END print;
+END;
+
+/**Tabla INVERSION**/
+CREATE TABLE Inversion_objtab OF Inversion_objtyp(
+	id PRIMARY KEY,
+	check(nombre_fondo is not null),
+	check(riesgo is not null),
+	check(categoria is not null),
+	SCOPE FOR(gerente) IS Gerente_objtab
+);
+
+
+/**Tipo PRESTAMO**/
+CREATE TYPE Prestamo_objtyp UNDER Operacion_objtyp(
+	finalidad varchar(40),
+	plazo date,
+	empleado REF Empleado_objtyp,
+	overriding member procedure print
+);
+
+/**Funcion print**/
+create or replace type body Prestamo_objtyp as 
+	
+	overriding member procedure print IS
+	BEGIN
+		DBMS_OUTPUT.PUT ('Prestamo');
+		DBMS_OUTPUT.PUT ('Finalidad: '||finalidad );
+		DBMS_OUTPUT.PUT ('Date: '||plazo);
+		DBMS_OUTPUT.NEW_LINE;
+	END print;
+END;
+
+/**Tabla PRESTAMO**/
+CREATE TABLE Prestamo_objtab OF Prestamo_objtyp(
+	id PRIMARY KEY,
+	check(finalidad is not null),
+	check(plazo is not null),
+	SCOPE FOR(empleado) IS Empleado_objtab
+	);
+
+
+/**Tipo TRANSFERENCIA**/
+CREATE TYPE Transferencia_objtyp UNDER Operacion_objtyp(
+	tipo varchar(40),
+	concepto varchar(50),
+	beneficiario number(15),
+	overriding member procedure print
+
+);
+
+/**Funcion print**/
+create or replace type body Transferencia_objtyp as 
+	
+	overriding member procedure print IS
+	BEGIN
+		DBMS_OUTPUT.PUT ('Transferencia');
+		DBMS_OUTPUT.PUT ('Tipo: '||tipo );
+		DBMS_OUTPUT.PUT ('Concepto: '||concepto);
+		DBMS_OUTPUT.PUT ('Beneficiario: '||beneficiario);
+		DBMS_OUTPUT.NEW_LINE;
+	END print;
+END;
+
+/**Tabla TRANSFERENCIA**/
+CREATE TABLE Transferencia_objtab OF Transferencia_objtyp(
+	id PRIMARY KEY,
+	check(tipo is not null),
+	check (UPPER(tipo) in ('EXTERIOR', 'NACIONAL')),
+	check(concepto is not null),
+	check(beneficiario is not null)
+
+);
 
 /**Tipo MOVIMIENTO TARJETA**/
 CREATE TYPE MovimientoTarjeta_objtyp AS OBJECT(
@@ -472,14 +571,16 @@ CREATE TABLE Movimiento_objtab OF Movimiento_objtyp(
 );
 */
 
-/**Tipo CUENTA**/
-CREATE TYPE Cuenta_objtyp AS OBJECT (
+/**Tabla anidada para CUENTA**/
+CREATE TYPE Cliente_ntabtyp AS TABLE OF REF Cliente_objtyp;
+
+create or replace TYPE Cuenta_objtyp AS OBJECT (
 	numCuenta number(20),
 	fecha_Contrato date,
 	saldo number(12,2),
 	tipocuenta REF TipoCuenta_objtyp,
 	movimientos Movimiento_ntabtyp,
-	cliente REF Cliente_objtyp,
+	clientes Cliente_ntabtyp,
 	map member function get_numCuenta return CHAR,
 	member procedure print,
 	member function ordenar (v_cuenta in Cuenta_objtyp) return integer
@@ -520,9 +621,9 @@ CREATE TABLE Cuenta_objtab OF Cuenta_objtyp(
 	check(fecha_Contrato is not null),
 	check(saldo is not null),
 	check(saldo > 0),
-	SCOPE FOR(tipocuenta) IS TipoCuenta_objtab,
-	SCOPE FOR(cliente) IS Cliente_objtab
-) NESTED TABLE movimientos STORE AS Movimiento_ntab(
+	SCOPE FOR(tipocuenta) IS TipoCuenta_objtab)
+    NESTED TABLE clientes STORE AS Cliente_ntab,
+NESTED TABLE movimientos STORE AS Movimiento_ntab(
 	(	
 	numero_mov PRIMARY KEY,
 	check(fecha_hora is not null),
@@ -532,8 +633,8 @@ CREATE TABLE Cuenta_objtab OF Cuenta_objtyp(
 	check(saldo is not null),
 	check(saldo > 0)
 	
-)
-);
+));
+
 
 
 
@@ -600,97 +701,7 @@ CREATE TABLE Tarjeta_objtab OF Tarjeta_objtyp(
 
 
 
-/**Tipo INVERSION**/
-CREATE TYPE Inversion_objtyp UNDER Operacion_objtyp(
-	nombre_fondo varchar(20),
-	riesgo varchar(20),
-	categoria varchar(20),
-	gerente REF Gerente_objtyp,
-	overriding member procedure print
-);
-/**Funcion print**/
-create or replace type body Inversion_objtyp as 
-	
-	overriding member procedure print IS
-	BEGIN
-		DBMS_OUTPUT.PUT ('Inversion');
-		DBMS_OUTPUT.PUT ('Nombre de fondo: '||nombre_fondo );
-		DBMS_OUTPUT.PUT ('Riesgo: '||riesgo);
-		DBMS_OUTPUT.PUT ('Categoria: '|| categoria );
-		DBMS_OUTPUT.NEW_LINE;
-	END print;
-END;
 
-/**Tabla INVERSION**/
-CREATE TABLE Inversion_objtab OF Inversion_objtyp(
-	id PRIMARY KEY,
-	check(nombre_fondo is not null),
-	check(riesgo is not null),
-	check(categoria is not null),
-	SCOPE FOR(gerente) IS Gerente_objtab
-);
-
-
-/**Tipo PRESTAMO**/
-CREATE TYPE Prestamo_objtyp UNDER Operacion_objtyp(
-	finalidad varchar(40),
-	plazo date,
-	empleado REF Empleado_objtyp,
-	overriding member procedure print
-);
-
-/**Funcion print**/
-create or replace type body Prestamo_objtyp as 
-	
-	overriding member procedure print IS
-	BEGIN
-		DBMS_OUTPUT.PUT ('Prestamo');
-		DBMS_OUTPUT.PUT ('Finalidad: '||finalidad );
-		DBMS_OUTPUT.PUT ('Date: '||plazo);
-		DBMS_OUTPUT.NEW_LINE;
-	END print;
-END;
-
-/**Tabla PRESTAMO**/
-CREATE TABLE Prestamo_objtab OF Prestamo_objtyp(
-	id PRIMARY KEY,
-	check(finalidad is not null),
-	check(plazo is not null),
-	SCOPE FOR(empleado) IS Empleado_objtab
-	);
-
-
-/**Tipo TRANSFERENCIA**/
-CREATE TYPE Transferencia_objtyp UNDER Operacion_objtyp(
-	tipo varchar(40),
-	concepto varchar(50),
-	beneficiario number(15),
-	overriding member procedure print
-
-);
-
-/**Funcion print**/
-create or replace type body Transferencia_objtyp as 
-	
-	overriding member procedure print IS
-	BEGIN
-		DBMS_OUTPUT.PUT ('Transferencia');
-		DBMS_OUTPUT.PUT ('Tipo: '||tipo );
-		DBMS_OUTPUT.PUT ('Concepto: '||concepto);
-		DBMS_OUTPUT.PUT ('Beneficiario: '||beneficiario);
-		DBMS_OUTPUT.NEW_LINE;
-	END print;
-END;
-
-/**Tabla TRANSFERENCIA**/
-CREATE TABLE Transferencia_objtab OF Transferencia_objtyp(
-	id PRIMARY KEY,
-	check(tipo is not null),
-	check (UPPER(tipo) in ('EXTERIOR', 'NACIONAL')),
-	check(concepto is not null),
-	check(beneficiario is not null)
-
-);
 
 
 

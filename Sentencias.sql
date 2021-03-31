@@ -77,8 +77,10 @@ FROM tarjeta_objtab p where p.tipo='DEBITO') and REF(cli) IN
 
 
 CREATE OR REPLACE VIEW Caducidad AS
-SELECT t.numTarjeta, t.fecha_Caducidad, t.CVV, t.tipo FROM tarjeta_objtab t
-WHERE t.fecha_Caducidad IN (SELECT min(fecha_Caducidad) FROM tarjeta_objtab);
+SELECT t.numTarjeta, t.fecha_Caducidad, t.CVV, t.tipo
+FROM tarjeta_objtab t
+WHERE t.fecha_Caducidad IN (SELECT min(fecha_Caducidad) FROM tarjeta_objtab WHERE fecha_Caducidad > SYSDATE);
+
 
 
 

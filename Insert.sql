@@ -1,7 +1,7 @@
 /*BANCO*/
 
 INSERT INTO Banco_objtab VALUES
-(Banco_objtyp(372837, 'Banco LUMA'));
+(Banco_objtyp(372837, 'Banco LUMA','Calle Hellín',2,'Albacete',02006));
 
 
 /*USUARIO CLIENTE*/
@@ -151,50 +151,58 @@ INSERT INTO Cuenta_objtab VALUES(
     cuenta_idcuenta_seq.nextval, TO_DATE('24/03/2020','dd/mm/yyyy'), 28394, 
     (SELECT ref(t) FROM TipoCuenta_objtab t WHERE tipo = 'JOVEN'),
     Movimiento_ntabtyp(Movimiento_objtyp(
-                        movimiento_idmovimiento_seq.nextval,TO_TIMESTAMP ('14-Sep-20 02:37:30.123000', 'DD-Mon-RR HH24:MI:SS.FF'), 'Inversion Ibex 35', 400, 16000,
+                        movimiento_idmovimiento_seq.nextval,TO_TIMESTAMP ('14-Sep-20 02:37:30.123000', 'DD-Mon-RR HH24:MI:SS.FF'),
+                        'Inversion Ibex 35', 400, 16000,
                         NULL, NULL, NULL,
                         (SELECT ref(o)
                         FROM Inversion_objtab o
                         WHERE o.id = 1)),
                     Movimiento_objtyp(
-                        movimiento_idmovimiento_seq.nextval,TO_TIMESTAMP ('02-Dic-20 13:03:30.123000', 'DD-Mon-RR HH24:MI:SS.FF'), 'Pago agua', 25, 16000,
+                        2,
+                        TO_TIMESTAMP ('02-Dic-20 13:03:30.123000',
+                        'DD-Mon-RR HH24:MI:SS.FF'), 'Pago agua', 25, 16000,
                         (SELECT ref(o)
                         FROM Transferencia_objtab o
                         WHERE o.id = 2),
-                        NULL, NULL, NULL)
-        ), 
-        (SELECT ref(u) FROM Cliente_objtab u WHERE u.dni = '27212721F')));
-
+                        NULL, NULL, NULL
+        )), 
+        Cliente_ntabtyp(
+            (SELECT REF(c) FROM Cliente_objtab c WHERE dni = '27212721F') 
+        )));
+        
+     
 INSERT INTO Cuenta_objtab VALUES(
     Cuenta_objtyp(
     cuenta_idcuenta_seq.nextval, TO_DATE('21/11/2020','dd/mm/yyyy'), 25548, 
     (SELECT ref(t) FROM TipoCuenta_objtab t WHERE tipo = 'ADULTO'),
     Movimiento_ntabtyp(Movimiento_objtyp(
-        movimiento_idmovimiento_seq.nextval,TO_TIMESTAMP ('03-Dic-20 12:37:30.123000', 'DD-Mon-RR HH24:MI:SS.FF'), 'Prestamo casa', 400, 16000,
+        3,TO_TIMESTAMP ('03-Dic-20 12:37:30.123000', 'DD-Mon-RR HH24:MI:SS.FF'), 'Prestamo casa', 400, 16000,
         NULL,(SELECT ref(o)
         FROM Prestamo_objtab o
         WHERE o.id = 25), NULL, NULL
     ),
     Movimiento_objtyp(
-       movimiento_idmovimiento_seq.nextval,TO_TIMESTAMP ('25-Nov-20 11:32:30.123000', 'DD-Mon-RR HH24:MI:SS.FF'), 'Prestamo casa pagar', 100, 16000,
+        4,TO_TIMESTAMP ('25-Nov-20 11:32:30.123000', 'DD-Mon-RR HH24:MI:SS.FF'), 'Prestamo casa pagar', 100, 16000,
         NULL, NULL, (SELECT ref(o)
         FROM Prestamo_objtab o
         WHERE o.id = 26),NULL
     )), 
-    (SELECT ref(u) FROM Cliente_objtab u WHERE u.dni = '28349273A')));
+    Cliente_ntabtyp(
+    (SELECT ref(u) FROM Cliente_objtab u WHERE u.dni = '28349273A'))));
 
 INSERT INTO Cuenta_objtab VALUES(
     Cuenta_objtyp(
     cuenta_idcuenta_seq.nextval, TO_DATE('24/03/2020','dd/mm/yyyy'), 88544, 
     (SELECT ref(t) FROM TipoCuenta_objtab t WHERE tipo = 'PENSIONISTA'),
     Movimiento_ntabtyp( Movimiento_objtyp(
-        movimiento_idmovimiento_seq.nextval,TO_TIMESTAMP ('03-Dic-20 12:37:30.123000', 'DD-Mon-RR HH24:MI:SS.FF'), 'Pago luz', 30, 16000,
+        5,TO_TIMESTAMP ('03-Dic-20 12:37:30.123000', 'DD-Mon-RR HH24:MI:SS.FF'), 'Pago luz', 30, 16000,
     (SELECT ref(o)
     FROM Transferencia_objtab o
     WHERE o.id = 1),
     NULL, NULL, NULL
     )), 
-    (SELECT ref(u) FROM Cliente_objtab u WHERE u.dni = '92831029P')));
+    Cliente_ntabtyp(
+    (SELECT ref(u) FROM Cliente_objtab u WHERE u.dni = '92831029P'))));
 
 
     

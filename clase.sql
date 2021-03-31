@@ -113,3 +113,67 @@ LFACTURAS_OBJTYP(2,25,1.5,21,(SELECT REF(P) FROM PRODUCTOS_TAB P WHERE NP=1))
 );
 
 SELECT * FROM TABLE(SELECT LINEAS FROM FACTURAS_TAB WHERE NF=1) LF, PRODUCTOS_TAB P WHERE LF.PRODUCTO=REF(P);
+
+
+/*trigger*/
+create or replace trigger nm_fac
+before insert on facturas_tab
+for each row
+begin
+    :new.nf := facturas_seq.nextval;
+end
+
+
+insert into facturas_tab
+values(NULL,SYSDATE,NULL, LFACTURAS_NTYP());
+/**Como se debe de hacer*/
+
+/*en la viata hayq ue quitar el campo a añadir con la secuencia para que no de error*/
+
+create view facturas as select fecha, precio_total, lineas from factura_Tab;
+
+create or replace trigger num_facplus
+instead of  insert on facturas
+for each row 
+begin 
+vnd := facturas_seq.nexval;
+    insert into facturas_tab
+    values(vnd, :new.fecha, :new.precio_total, :new.lineaFactura);
+end;
+
+insert into facturas_tab
+values(NULL,SYSDATE,NULL, LFACTURAS_NTYP());
+
+
+insert into facturas values(
+    sysdate, null, lfacturas_ntyp(lfacturas_objtyp(1,1,1,21,null),
+                    lfacturas_objtyp(2,2,2,21,null))
+);
+
+insert into table (select lineas from facturas where nf=6) values(lfacturas_objtyp(2,2,2,21,null));
+
+
+
+CREATE OR REPLACE TRIGGER PTOTAL
+INSTEAD OF INSERT OR UPDATE ON FACTURAS
+FOR EACH ROW
+DECLARE	
+	PT NUMBER := 0;
+BEGIN
+	IF LINEAS IS NOT NULL THEN
+		FOR I IN 1..:NEW.LINEAS.COUNT LOOP 
+			PT:= PT + :NEW.LINEAS(I).PRECIO * :NEW.LINEAS(I).CTD
+		END LOOP;
+	ELSE
+		PT := 0
+	END IF;
+	
+	IF INSERTING THEN
+		INSERT INTO FACTURAS_TAB
+		VALUES (FACTURAS_SEQ.nextval, :NEW.FECHA, PT, :NEW.LINEAS);
+	END IF;
+	IF UPDATING THEN
+		UPDATE FACTURAS_TAB
+		SET FECHA = :NEW.FECHA, PRECIO_TOTAL = PT, LINEAS = :NEW.LINEAS;
+	END IF;
+END;
