@@ -86,6 +86,34 @@ WHERE t.fecha_Caducidad IN (SELECT min(fecha_Caducidad) FROM tarjeta_objtab WHER
 
 /****************************************/
 
+/*Informacion de la sucursal de Albacete y sus ususarios*/
+
+CREATE OR REPLACE VIEW Info_sucursal_usuario AS
+SELECT cu.localidad,  cu.telefono, cu.calle, cu.numero, cu.codigo_postal, cli.dni, cli.nombre, cli.fecha_nacimiento
+FROM sucursal_objtab cu, cliente_objtab cli
+WHERE REF(cli) IN
+(SELECT ref(c) FROM Cliente_objtab c WHERE c.dni = '&DNI' ) and cu.localidad='Albacete' ;
+
+
+/*Gerente que tiene mas inversiones de riesgo medio*/
+
+CREATE OR REPLACE VIEW Gerente_Mas_Inversiones_Riesgo_Medio AS
+SELECT g.*
+FROM gerente_objtab g
+WHERE REF(g)=
+ (SELECT max(i.gerente)
+FROM inversion_objtab i where i.riesgo='Medio');
+
+/*Tipo de empleado según el turno (mañana o tarde) */
+
+CREATE OR REPLACE VIEW Tipo_Empleado_Segun_Turno AS
+SELECT te.*
+FROM tipoempleado_objtab te
+WHERE ref(te)
+IN (SELECT e.tipo
+FROM empleado_objtab e where e.turno='&TURNO');
+/***************************/
+
 /*CREATE OR REPLACE VIEW PART_FED_MAYOR_MEDALLERO ("NOMBRE", "APELLIDOS", "TELEFONO", "EMAIL") AS
 SELECT part.Nombre, part.apellidos, part.Telefono, part.email
 FROM participante_objtab part
