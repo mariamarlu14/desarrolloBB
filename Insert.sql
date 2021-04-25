@@ -112,11 +112,15 @@ INSERT INTO TipoCuenta_objtab VALUES(
 
 INSERT INTO Transferencia_objtab VALUES(
     Transferencia_objtyp(
-        transferencia_idtransferencia_seq.nextval,TO_TIMESTAMP ('10-Sep-02 14:10:10.123000', 'DD-Mon-RR HH24:MI:SS.FF'),  'NO INICIADA', 300.5, 'NACIONAL', 'luz', 1));
+        transferencia_idtransferencia_seq.nextval,TO_TIMESTAMP ('10-Sep-02 14:10:10.123000', 'DD-Mon-RR HH24:MI:SS.FF'),  'NO INICIADA', 300.5, 'NACIONAL', 'luz', 1,
+        (SELECT ref(o)
+    FROM Cuenta_objtab o
+    WHERE o.numCuenta = 236)));
 INSERT INTO Transferencia_objtab VALUES(
     Transferencia_objtyp(
-        transferencia_idtransferencia_seq.nextval,TO_TIMESTAMP ('12-Sep-02 12:10:10.123000', 'DD-Mon-RR HH24:MI:SS.FF'),  'NO INICIADA', 10.5, 'NACIONAL', 'agua', 1));
-
+        transferencia_idtransferencia_seq.nextval,TO_TIMESTAMP ('12-Sep-02 12:10:10.123000', 'DD-Mon-RR HH24:MI:SS.FF'),  'NO INICIADA', 10.5, 'NACIONAL', 'agua', 1,(SELECT ref(o)
+    FROM Cuenta_objtab o
+    WHERE o.numCuenta = 236)));
 
 
 /*OPERACION INVERSION*/

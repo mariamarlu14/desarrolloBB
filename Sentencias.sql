@@ -215,3 +215,20 @@ t2.column_value.nombre as "NOMBRE SOLICITUD"
 from usuario_objtab t1, table(treat (value (t1) as promotor_objtyp).solicitud) t2
 where value (t1) is of (promotor_objtyp)
 and t2.column_value.estadosolicitud = 'EN CURSO';
+
+
+/*Información de las transferencias de una cuenta*/
+CREATE OR REPLACE VIEW Datos_Transferencia ("NUMERO_CUENTA", "FECHA_CONTRATO", "N_MOVIMIENTO", "CARGO", "TIPO", "CONCEPTO")  AS
+SELECT C.NumCuenta,C.Fecha_Contrato, C.numero_mov, C.cargo, T.tipo, T.concepto
+FROM cuenta_objtab C, Transferencia_objtab T
+WHERE C.numCuenta = '&NUMERO_CUENTA' AND ;
+
+
+/*Cliente que tiene más cuentas asociadas*/
+
+CREATE OR REPLACE VIEW Cliente_Con_Mas_Cuentas ("DNI", "Nombre", "Telefono", "Numero_Cliente")AS
+SELECT c.dni, c.nombre, c.telefono, c.numero_cliente
+FROM Cliente_objtab c
+WHERE c.dni IN (SELECT max(cu.clientes.dni)
+FROM Cuenta_objtab cu);
+

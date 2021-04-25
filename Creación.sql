@@ -389,6 +389,8 @@ CREATE TABLE Inversion_objtab OF Inversion_objtyp(
 	check(nombre_fondo is not null),
 	check(riesgo is not null),
 	check(categoria is not null),
+	check(gerente is not null),
+
 	SCOPE FOR(gerente) IS Gerente_objtab
 );
 
@@ -414,12 +416,15 @@ create or replace type body Prestamo_objtyp as
 END;
 
 /**Tabla PRESTAMO**/
+
 CREATE TABLE Prestamo_objtab OF Prestamo_objtyp(
-	id PRIMARY KEY,
-	check(finalidad is not null),
-	check(plazo is not null),
-	SCOPE FOR(empleado) IS Empleado_objtab
-	);
+    id PRIMARY KEY,
+    check(finalidad is not null),
+    check(plazo is not null),
+    SCOPE FOR(empleado) IS Empleado_objtab
+    );
+
+
 
 
 /**Tipo TRANSFERENCIA**/
@@ -427,6 +432,7 @@ CREATE TYPE Transferencia_objtyp UNDER Operacion_objtyp(
 	tipo varchar(40),
 	concepto varchar(50),
 	beneficiario number(15),
+	cuentaOrigen REF Cuenta_objtyp,
 	overriding member procedure print
 
 );
@@ -450,7 +456,9 @@ CREATE TABLE Transferencia_objtab OF Transferencia_objtyp(
 	check(tipo is not null),
 	check (UPPER(tipo) in ('EXTERIOR', 'NACIONAL')),
 	check(concepto is not null),
-	check(beneficiario is not null)
+	check(beneficiario is not null),
+	SCOPE FOR(cuentaOrigen) IS Cuenta_objtab
+
 
 );
 
@@ -461,6 +469,7 @@ CREATE TYPE MovimientoTarjeta_objtyp AS OBJECT(
 	concepto varchar(50),
 	cargo number(10),
 	mensualidad number(12, 2),
+	pasada varchar(50),
 	map member function get_numero_movt return CHAR,
 	member procedure print,
 	member function ordenar (v_movimientoT in MovimientoTarjeta_objtyp) return integer
@@ -517,7 +526,7 @@ create or replace TYPE Movimiento_objtyp AS OBJECT(
 
 
 /**Tabla anidada para TARJETA**/
-CREATE TYPE Movimientotarjeta_ntabtyp AS TABLE OF Movimientotarjeta_ntabtyp;
+CREATE TYPE Movimientotarjeta_ntabtyp AS TABLE OF Movimientotarjeta_objtyp;
 
 /**Tabla anidada para CUENTA**/
 CREATE TYPE Movimiento_ntabtyp AS TABLE OF Movimiento_objtyp;
