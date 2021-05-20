@@ -1,6 +1,101 @@
 /**IMPORTANTE: la tabla transferencia, cuenta y tarjeta hasta que no se compila el tipo no se puede crear**/
 
 
+
+DROP TYPE banco_objtyp FORCE;
+/
+DROP TYPE cliente_ntabtyp FORCE;
+/
+DROP TYPE cliente_objtyp FORCE;
+/
+DROP TYPE cuenta_ntabtyp FORCE;
+/
+DROP TYPE cuenta_objtyp FORCE;
+/
+DROP TYPE empleado_objtyp FORCE;
+/
+DROP TYPE gerente_objtyp FORCE;
+/
+DROP TYPE inversion_objtyp FORCE;
+/
+DROP TYPE movimiento_ntabtyp FORCE;
+/
+DROP TYPE movimiento_objtyp FORCE;
+/
+DROP TYPE movimientotarjeta_ntabtyp FORCE;
+/
+DROP TYPE movimientotarjeta_objtyp FORCE;
+/
+DROP TYPE operacion_objtyp FORCE;
+/
+DROP TYPE prestamo_objtyp FORCE;
+/
+DROP TYPE sucursal_objtyp FORCE;
+/
+DROP TYPE tarjeta_objtyp FORCE;
+/
+DROP TYPE tipocuenta_objtyp FORCE;
+/
+DROP TYPE tipoempleado_objtyp FORCE;
+/
+DROP TYPE transferencia_objtyp FORCE;
+/
+DROP TYPE usuario_objtyp FORCE;
+/
+DROP TYPE usuarios_ntabtyp FORCE;
+/
+
+DROP TABLE banco_objtab PURGE;
+/
+DROP TABLE cliente_objtab PURGE;
+/
+DROP TABLE cuenta_objtab PURGE;
+/
+DROP TABLE empleado_objtab PURGE;
+/
+DROP TABLE gerente_objtab PURGE;
+/
+DROP TABLE inversion_objtab PURGE;
+/
+DROP TABLE operacion_objtab PURGE;
+/
+DROP TABLE prestamo_objtab PURGE;
+/
+DROP TABLE sucursal_objtab PURGE;
+/
+DROP TABLE tarjeta_objtab PURGE;
+/
+DROP TABLE tipocuenta_objtab PURGE;
+/
+DROP TABLE tipoempleado_objtab PURGE;
+/
+DROP TABLE transferencia_objtab PURGE;
+/
+
+DROP SEQUENCE system.sucursal_idsucursal_seq;
+/
+DROP SEQUENCE system.gerente_idgerente_seq;
+/
+DROP SEQUENCE system.empleado_idempleado_seq;
+/
+DROP SEQUENCE system.movimiento_idmovimiento_seq;
+/
+DROP SEQUENCE system.cliente_numerocliente_seq;
+/
+DROP SEQUENCE system.cuenta_idcuenta_seq;
+/
+DROP SEQUENCE system.transferencia_idtransferencia_seq;
+/
+DROP SEQUENCE system.prestamo_idprestamo_seq;
+/
+DROP SEQUENCE system.inversion_idinversion_seq;
+/
+DROP SEQUENCE system.movimientoTarjeta_idmovimientoTarjeta_seq;
+/
+DROP SEQUENCE system.tarjeta_idtarjeta_seq;
+/
+
+
 /** Tipo BANCO**/
 CREATE TYPE Banco_objtyp AS OBJECT(
 	cif char(10),
