@@ -1,0 +1,315 @@
+begin
+    dbms_xmlschema.registerschema(schemaurl=>'Operacion.xsd', 
+    schemadoc=> '<?xml version="1.0" encoding="UTF-8"?> 
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:element name="transferencia" type="TipoTransferencia">
+    <xs:key name= "Num_transferencia">
+        <xs:selector xpath= "xs:transferencia" />
+        <xs:field xpath="xs:num_transferencia"/> 
+    </xs:key>
+</xs:element>
+	
+	<xs:complexType name="TipoTransferencia">
+		<xs:sequence>
+		 <xs:element name="empleado" type="TipoEmpleado" minOccurs="1" maxOccurs="unbounded"/>
+	     <xs:element name="cuenta" type="TipoCuenta" minOccurs="0" maxOccurs="unbounded"/>
+	     <xs:element name="cliente" type="TipoCliente" minOccurs="1" maxOccurs="unbounded"/>
+	    </xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="TipoEmpleado">
+		<xs:sequence> <xs:element name="dni" type="xs:string" />
+	        <xs:element name="nombre" type="xs:string" />
+	        <xs:element name="telefono" type="xs:integer" />
+	        <xs:element name="calle" type="xs:string" />
+	        <xs:element name="email" type="xs:string" />
+	        <xs:element name="numero" type="xs:string" />
+	        <xs:element name="localidad" type="xs:string" />
+	        <xs:element name="codigo_postal" type="xs:string" />
+	        <xs:element name="numero_empleado" type="xs:string"/>
+	        <xs:element name="extension" type="xs:integer"/>
+	        <xs:element name="salario" type="xs:integer"/>
+	        <xs:element name="turno" type="xs:string" nillable="true"/>
+		</xs:sequence>
+	    <xs:attribute name="tipo" use="required" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="TipoCuenta">
+		<xs:sequence>
+	        <xs:element name="numCuenta" type="xs:integer"/>
+	        <xs:element name="saldo" type="xs:integer"/>
+	        <xs:element name="fecha_contrato" type="xs:date"/>
+	        <xs:element name="tipoCuenta" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TipoCliente">
+		<xs:sequence>
+	       <xs:element name="dni" type="xs:string" />
+	        <xs:element name="nombre" type="xs:string" />
+	        <xs:element name="telefono" type="xs:integer" />
+	        <xs:element name="calle" type="xs:string" />
+	        <xs:element name="email" type="xs:string" />
+	        <xs:element name="numero" type="xs:string" />
+	        <xs:element name="localidad" type="xs:string" />
+	        <xs:element name="codigo_postal" type="xs:string" />
+	        <xs:element name="numero_cliente" type="xs:integer"/>
+		</xs:sequence>
+	</xs:complexType>
+
+</xs:schema>',
+local=> true, gentypes => false, genbean=> false, gentables=> false, force => false, 
+options => dbms_xmlschema.register_binaryxml, owner=> user);
+
+commit;
+
+end;
+
+
+
+CREATE TABLE Operacion (ID NUMBER, DATOS XMLTYPE)
+XMLTYPE COLUMN DATOS STORE AS BINARY XML
+XMLSCHEMA "Operacion.xsd" ELEMENT "transferencia";
+
+
+
+INSERT INTO Operacion VALUES (1,
+'<?xml version="1.0" encoding="UTF-8"?>
+<transferencia>
+	<empleado tipo="administrador">
+		<dni>7647477L</dni>
+
+		<nombre>Pedro</nombre>
+		<telefono>666666666</telefono>
+		<calle>Av.España</calle>
+		<email>admin1@gmail.com</email>
+		<numero>2</numero>
+		<localidad>Albacete</localidad>
+		<codigo_postal>02006</codigo_postal>
+		<numero_empleado>1</numero_empleado>
+		<extension>552</extension>
+		<salario>2100</salario>
+		<turno>tarde</turno>
+	</empleado>
+	<empleado tipo="recursoshumanos">
+		<dni>555454F</dni>
+
+		<nombre>Ana</nombre>
+		<telefono>777777777</telefono>
+		<calle>Av.Madrid</calle>
+		<email>rh1@gmail.com</email>
+		<numero>2</numero>
+		<localidad>Albacete</localidad>
+		<codigo_postal>02006</codigo_postal>
+		<numero_empleado>2</numero_empleado>
+		<extension>772</extension>
+		<salario>1890</salario>
+		<turno>tarde</turno>
+	</empleado>
+	<cuenta>
+		<numCuenta>25254858</numCuenta>
+		<saldo >32525241</saldo >
+		<fecha_contrato>2020-02-01</fecha_contrato>
+		<tipoCuenta>Joven</tipoCuenta>
+	</cuenta>
+	<cuenta>
+		<numCuenta>85854854</numCuenta>
+		<saldo >2546982</saldo >
+		<fecha_contrato>2019-05-02</fecha_contrato>
+		<tipoCuenta>Joven</tipoCuenta>
+	</cuenta>
+	<cliente >
+		<dni>888888S</dni>
+		<nombre>Maria</nombre>
+		<telefono>858548548</telefono>
+		<calle>Calle Hellin</calle>
+		<email>maria@gmail.com</email>
+		<numero>2</numero>
+		<localidad>Albacete</localidad>
+		<codigo_postal>02006</codigo_postal>
+		<numero_cliente>2858</numero_cliente>
+	</cliente>
+	<cliente >
+		<dni>85474525T</dni>
+		<nombre>Lucia</nombre>
+		<telefono>858585658</telefono>
+		<calle>Calle Quijote</calle>
+		<email>lucia@gmail.com</email>
+		<numero>8</numero>
+		<localidad>Albacete</localidad>
+		<codigo_postal>02006</codigo_postal>
+		<numero_cliente>2852</numero_cliente>
+	</cliente>
+	<cliente >
+		<dni>43323523D</dni>
+		<nombre>Tomás</nombre>
+		<telefono>666588555</telefono>
+		<calle>Av.España</calle>
+		<email>tomas@gmail.com</email>
+		<numero>82</numero>
+		<localidad>Albacete</localidad>
+		<codigo_postal>02006</codigo_postal>
+		<numero_cliente>14585</numero_cliente>
+	</cliente>
+</transferencia>');
+
+
+
+
+INSERT INTO Operacion VALUES (2,
+'<?xml version="1.0" encoding="UTF-8"?>
+<transferencia>
+	<empleado tipo="administrador">
+		<dni>85858582G</dni>
+
+		<nombre>Juan</nombre>
+		<telefono>96857452</telefono>
+		<calle>Calle Lanza</calle>
+		<email>admin2@gmail.com</email>
+		<numero>2</numero>
+		<localidad>Albacete</localidad>
+		<codigo_postal>02006</codigo_postal>
+		<numero_empleado>3</numero_empleado>
+		<extension>559</extension>
+		<salario>2125</salario>
+		<turno>mañana</turno>
+	</empleado>
+	<empleado tipo="recursoshumanos">
+		<dni>11122233Y</dni>
+
+		<nombre>Elena</nombre>
+		<telefono>965854253</telefono>
+		<calle>Calle Literatura</calle>
+		<email>rh2@gmail.com</email>
+		<numero>2</numero>
+		<localidad>Albacete</localidad>
+		<codigo_postal>02006</codigo_postal>
+		<numero_empleado>2</numero_empleado>
+		<extension>778</extension>
+		<salario>1870</salario>
+		<turno>mañana</turno>
+	</empleado>
+	<cuenta>
+		<numCuenta>8574585</numCuenta>
+		<saldo >9630000</saldo >
+		<fecha_contrato>2021-02-01</fecha_contrato>
+		<tipoCuenta>Adulto</tipoCuenta>
+	</cuenta>
+	<cuenta>
+		<numCuenta>22266633</numCuenta>
+		<saldo >12054</saldo >
+		<fecha_contrato>2020-05-02</fecha_contrato>
+		<tipoCuenta>Joven</tipoCuenta>
+	</cuenta>
+	<cliente >
+		<dni>1234567D</dni>
+		<nombre>Rocio</nombre>
+		<telefono>968547231</telefono>
+		<calle>Calle Mancha</calle>
+		<email>rocio@gmail.com</email>
+		<numero>2</numero>
+		<localidad>Albacete</localidad>
+		<codigo_postal>02006</codigo_postal>
+		<numero_cliente>8765</numero_cliente>
+	</cliente>
+	<cliente >
+		<dni>6321457L</dni>
+		<nombre>Carmen</nombre>
+		<telefono>654321987</telefono>
+		<calle>Calle Zarza</calle>
+		<email>carmen@gmail.com</email>
+		<numero>8</numero>
+		<localidad>Albacete</localidad>
+		<codigo_postal>02006</codigo_postal>
+		<numero_cliente>9876</numero_cliente>
+	</cliente>
+	
+</transferencia>');
+
+XPATH
+
+CREATE VIEW NombreEmpleado AS
+SELECT extract(datos,'//empleado/nombre')
+FROM Operacion
+WHERE id = 1;
+
+CREATE VIEW numerosCuenta AS
+SELECT extract(datos,'/transferencia/cuenta/numCuenta')
+FROM Operacion
+WHERE id = 1;
+
+CREATE VIEW Administrador AS
+SELECT o.datos.extract('/transferencia/empleado[@tipo="administrador"]/dni/text()')
+FROM Operacion o
+WHERE o.id = 1;
+
+
+
+CREATE VIEW Cliente_1234567D AS
+SELECT EXTRACT(datos, '//cliente [dni = "1234567D"]/sss/text()') AS Operacion
+FROM operacion
+WHERE ID = 2;
+
+
+CREATE VIEW Cuenta_Saldo_Mayor_100 AS
+SELECT EXTRACT(datos, '//cuenta [saldo > 100]/numCuenta') AS PROYECTO
+FROM operacion
+WHERE ID = 2;
+
+
+XQUERY
+
+CREATE VIEW SaldoMayorA AS
+SELECT ptab.column_value
+FROM operacion p, xmltable ( 'for $i in //cuenta
+where $i//saldo > 9620000
+return $i//numCuenta'
+PASSING p.datos) ptab;
+
+CREATE VIEW TOTAL_Saldo AS
+SELECT XMLQUERY('for $i in //cuenta
+let $don := $i//saldo
+let $sum := sum($don)
+return $sum'
+PASSING datos RETURNING CONTENT) AS TOTAL_Saldo
+FROM operacion
+WHERE ID = 2;
+
+
+INSERCION
+
+
+UPDATE Operacion
+SET datos = APPENDCHILDXML(datos, '/empleado',
+xmltype(
+'<empleado>
+        <dni>11122233Y</dni>
+		<nombre>Elena</nombre>
+		<telefono>622555222</telefono>
+		<calle>Calle Literatura</calle>
+		<email>rh2@gmail.com</email>
+		<numero>2</numero>
+		<localidad>Albacete</localidad>
+		<codigo_postal>02006</codigo_postal>
+		<numero_empleado>2</numero_empleado>
+		<extension>778</extension>
+		<salario>2050</salario>
+		<turno>mañana</turno>
+</empleado>'
+)
+)
+WHERE ID = 2;
+
+
+ACTUALIZACION
+
+
+UPDATE Operacion
+SET datos = UPDATEXML(datos,'/transferencia/empleado[dni="85858582G"][2]/salario/text()', 2090)
+WHERE ID = 2;
+
+
+
+BORRADO
+
+UPDATE Operacion
+SET datos = DELETEXML(datos, '/transferencia/empleado[dni="85858582G"][2]')
+WHERE ID = 2;

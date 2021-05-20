@@ -168,6 +168,15 @@ BEGIN
     END IF;
 
 END;
+
+
+
+INSERT INTO Transferencia_objtab VALUES(
+    Transferencia_objtyp(
+        transferencia_idtransferencia_seq.nextval,TO_TIMESTAMP ('12-Sep-02 12:10:10.123000', 'DD-Mon-RR HH24:MI:SS.FF'),  'NO INICIADA', 10.5, 'NACIONAL', 'agua', 1,(SELECT ref(o)
+    FROM Cuenta_objtab o
+    WHERE o.numCuenta = 1)));
+
 ------------------------------------------------------------------------------------------------------------------
 
 
@@ -417,6 +426,19 @@ BEGIN
 		
 END;
 
+create or replace trigger setInversionEnCurso
+    after insert on inversion_objtab
+    declare
+        valorsecuencia inversion_objtab.id%type;
+    begin
+        select inversion_idinversion_seq.currval into valorsecuencia
+            from dual;
+
+        update inversion_objtab
+            set estado = 'EN CURSO'
+            where id = valorsecuencia;
+    end;
+
 
 
 
@@ -432,3 +454,69 @@ create or replace trigger setInversionEnCurso
             set estado = 'EN CURSO'
             where id = valorsecuencia;
     end;
+
+
+
+create or replace NONEDITIONABLE TRIGGER  insercionDeMovimientoTarjetaDebito 
+after insert or update on tarjeta_objtab
+declare
+tarjeta tarjeta_objtyp;
+nt tarjeta_objtab.numTarjeta%type;
+tipoT tarjeta_objtab.tipo%type;
+nC cuenta_objtab.numCuenta%type;
+saldocuenta   cuenta_objtab.saldo%TYPE;
+sal           NUMBER(12, 2);
+
+mov movimientotarjeta_ntabtyp;
+cuenta ref cuenta_objtyp;
+cargo number(12, 2);
+ begin
+ /*select numcuenta BULK COLLECT INTO TPROF from cuenta_objtab;*/
+FOR I IN (SELECT numTarjeta numT FROM tarjeta_objtab P) LOOP
+
+
+         select tipo into tipoT from Tarjeta_objtab where numTarjeta=i.numT;
+
+        if tipoT='DEBITO' THEN
+         select movimientos into mov from Tarjeta_objtab where numTarjeta=i.numT;
+         select cuenta into cuenta from Tarjeta_objtab where numTarjeta=i.numT;
+            FOR j IN mov.FIRST..mov.LAST LOOP
+                if mov(j).pasada ='NO' then
+
+                         select numCuenta into nC from cuenta_objtab e where ref(e)=cuenta;
+
+
+       SELECT g.saldo INTO  saldocuenta FROM cuenta_objtab g  WHERE  numCuenta = nC;
+
+         sal := saldocuenta - mov(j).cargo;
+
+            INSERT INTO TABLE 
+            (SELECT Movimientos FROM cuenta_objtab WHERE numcuenta = nC)
+                VALUES (movimientoTarjeta_idmovimientoTarjeta_seq.nextval, mov(j).fecha_hora , 'TARJETA', mov(j).cargo, sal,NULL,NULL,NULL,NULL);
+
+
+        UPDATE cuenta_objtab SET saldo = sal  WHERE numCuenta = nC;
+
+
+                 end if;
+
+                       UPDATE TABLE (SELECT Movimientos FROM tarjeta_objtab WHERE numTarjeta = i.numT and tipo='DEBITO')
+          SET pasada = 'YES';
+            end loop;
+    end if;
+end loop;
+         DBMS_OUTPUT.PUT_LINE('Se han pasado los movimientos de la tarjeta de debito correctamente');
+
+ end;
+
+
+ INSERT INTO Tarjeta_objtab VALUES(
+    Tarjeta_objtyp(
+    tarjeta_idtarjeta_seq.nextval, TO_DATE('14/05/2020','dd/mm/yyyy'), 123, 'DEBITO', 
+    (SELECT ref(c) 
+    FROM Cuenta_objtab c
+    WHERE c.numcuenta = 1),
+    MovimientoTarjeta_ntabtyp(
+    movimientoTarjeta_objtyp(
+        movimientoTarjeta_idmovimientoTarjeta_seq.nextval,
+        TO_TIMESTAMP ('13-Oct-20 11:37:30.123000', 'DD-Mon-RR HH24:MI:SS.FF'), 'Comprar Mercadona', 95.2, 1,'NO'))));

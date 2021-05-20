@@ -7,7 +7,7 @@ CREATE OR REPLACE VIEW Info_cuentas_usuario AS
 SELECT cu.numcuenta, cu.fecha_contrato, cu.saldo, cli.dni, cli.nombre, cli.telefono, cli.fecha_nacimiento, cli.calle, cli.numero, cli.localidad
 FROM cuenta_objtab cu, cliente_objtab cli
 WHERE REF(cli) IN
-(SELECT ref(c) FROM Cliente_objtab c WHERE c.dni = '&DNI');
+(SELECT ref(c) FROM Cliente_objtab c WHERE c.dni = '27212721F');
 
 
 
@@ -17,7 +17,7 @@ WHERE REF(cli) IN
 
 CREATE OR REPLACE VIEW Prestamo_no_iniciado AS
     SELECT p.id, p.fecha, p.estado, p.saldo_op, p.finalidad, p.plazo, p.empleado.nombre AS nombre FROM Prestamo_objtab p
-     WHERE p.empleado.dni = '&DNI' AND p.estado = 'NO INICIADA';
+     WHERE p.empleado.dni = '12345678K' AND p.estado = 'NO INICIADA';
 
 
 

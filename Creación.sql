@@ -10,7 +10,7 @@ CREATE TYPE Banco_objtyp AS OBJECT(
 	member procedure print,
 	member function ordenar (v_banco in Banco_objtyp) return integer
 );
-
+/
 /**Función getCIF, print, ordernarBanco**/
 create or replace type body Banco_objtyp as 
 	map member function get_CIF return CHAR is
@@ -36,7 +36,7 @@ create or replace type body Banco_objtyp as
 	end if;
 	END;	
 END;
-
+/
 /**Tabla BANCO**/
 CREATE TABLE Banco_objtab OF Banco_objtyp (
 	cif PRIMARY KEY,
@@ -47,7 +47,7 @@ CREATE TABLE Banco_objtab OF Banco_objtyp (
 	check(codigo_postal is not null),
 	nombre unique
 );
-
+/
 /**Tipo USUARIO**/
 CREATE TYPE Usuario_objtyp AS OBJECT(
 	dni varchar(9),
@@ -63,11 +63,11 @@ CREATE TYPE Usuario_objtyp AS OBJECT(
 	member procedure cambiarTelefono(telefono_U IN VARCHAR2),
 	member function ordenar (v_usuarios in Usuario_objtyp) return integer
 ) NOT INSTANTIABLE  NOT FINAL;
-
+/
 
 /**Tabla anidada para Sucursal **/
 CREATE TYPE Usuarios_ntabtyp AS TABLE OF REF Usuario_objtyp;
-
+/
 /**Funcion getDNI, cambiarTelefono, ordenarUsuario**/
 create or replace type body Usuario_objtyp as 
 	map member function get_dni return CHAR is
@@ -102,7 +102,7 @@ create or replace type body Usuario_objtyp as
 	end if;
 	END;
 END;
-
+/
 
 /**Tabla USUARIO**/
 /*
@@ -135,7 +135,7 @@ CREATE TYPE Sucursal_objtyp AS OBJECT(
 	member function ordenar (v_sucursal in Sucursal_objtyp) return integer
 
 );
-
+/
 /**Funcion getID, print, cambiarTelefono, ordenar**/
 create or replace type body Sucursal_objtyp as 
 	map member function get_id return CHAR is
@@ -167,7 +167,7 @@ create or replace type body Sucursal_objtyp as
 	end if;
 	END;
 END;
-
+/
 /**Tabla Sucursal**/
 CREATE TABLE Sucursal_objtab OF Sucursal_objtyp (
 	localidad PRIMARY KEY,
@@ -179,7 +179,7 @@ CREATE TABLE Sucursal_objtab OF Sucursal_objtyp (
 	check(codigo_postal is not null)
 ) NESTED TABLE Usuarios STORE AS Usuarios_ntab;
 
-
+/
 /**Tipo GERENTE**/
 CREATE TYPE Gerente_objtyp UNDER Usuario_objtyp(
 	numero_gerente varchar(10),
@@ -189,7 +189,7 @@ CREATE TYPE Gerente_objtyp UNDER Usuario_objtyp(
 	overriding member procedure print
 	
 );
-
+/
 /**Funcion print**/
 create or replace type body Gerente_objtyp as 
 	
@@ -205,7 +205,7 @@ create or replace type body Gerente_objtyp as
 	
 
 END;
-
+/
 /**Tabla GERENTE**/
 CREATE TABLE Gerente_objtab OF Gerente_objtyp(
 	dni PRIMARY KEY,
@@ -218,10 +218,10 @@ CREATE TABLE Gerente_objtab OF Gerente_objtyp(
 	extension unique
 );
 
-
+/
 /**Tipo TIPOEMPLEADO**/
 CREATE TYPE TipoEmpleado_objtyp AS OBJECT(tipo char(15));
-
+/
 /**Tabla TIPOEMPLEADO**/
 CREATE TABLE TipoEmpleado_objtab OF TipoEmpleado_objtyp(
 	tipo PRIMARY KEY,
@@ -229,7 +229,7 @@ CREATE TABLE TipoEmpleado_objtab OF TipoEmpleado_objtyp(
 		UPPER(tipo) in ('ADMINISTRADOR', 'CAJERO', 'CONTABLE')
 	)
 );
-
+/
 
 /**Tipo EMPLEADO**/
 CREATE TYPE Empleado_objtyp UNDER Usuario_objtyp(
@@ -241,7 +241,7 @@ CREATE TYPE Empleado_objtyp UNDER Usuario_objtyp(
 	overriding member procedure print
 
 );
-
+/
 /**Funcion print**/
 create or replace type body Empleado_objtyp as 
 	
@@ -256,7 +256,7 @@ create or replace type body Empleado_objtyp as
 	END print;
 
 END;
-
+/
 /**Tabla EMPLEADO**/
 CREATE TABLE Empleado_objtab OF Empleado_objtyp(
 	dni PRIMARY KEY,
@@ -269,7 +269,7 @@ CREATE TABLE Empleado_objtab OF Empleado_objtyp(
 	check (UPPER(turno) in ('MAÑANA', 'TARDE')),
 	SCOPE FOR(tipo) IS TipoEmpleado_objtab
 );
-
+/
 
 /**Tipo TIPOCUENTA**/
 CREATE TYPE TipoCuenta_objtyp AS OBJECT(
@@ -278,7 +278,7 @@ CREATE TYPE TipoCuenta_objtyp AS OBJECT(
 	comision number(12, 2)
 
 );
-
+/
 /**Tabla TIPOCUENTA**/
 CREATE TABLE TipoCuenta_objtab OF TipoCuenta_objtyp(
 	tipo PRIMARY KEY,
@@ -288,20 +288,20 @@ CREATE TABLE TipoCuenta_objtab OF TipoCuenta_objtyp(
 	check(comision is not null),
 	check(comision > 0)
 );
-
+/
 
 
 
 /**Tipo CLIENTE**/
 CREATE TYPE Cliente_objtyp UNDER Usuario_objtyp(numero_cliente varchar(10));
-
+/
 /**Tabla CLIENTE**/
 CREATE TABLE Cliente_objtab OF Cliente_objtyp(
 	dni PRIMARY KEY,
 	numero_cliente unique,
 	check(numero_cliente is not null)
 );
-
+/
 
 
 /**Tipo OPERACION**/
@@ -315,7 +315,7 @@ CREATE TYPE Operacion_objtyp AS OBJECT(
 	member procedure cambiarEstado(estado_O IN VARCHAR2),
 	member function ordenar (v_operacion in Operacion_objtyp) return integer
 ) NOT FINAL;
-
+/
 /**Funcion getID, print, cambiarEstado, ordenar**/
 create or replace type body Operacion_objtyp as 
 	map member function get_id return CHAR is
@@ -346,7 +346,7 @@ create or replace type body Operacion_objtyp as
 	end if;
 	END;
 END;
-
+/
 /**Tabla OPERACION**/
 /*
 CREATE TABLE Operacion_objtab OF Operacion_objtyp(
@@ -363,6 +363,7 @@ CREATE TABLE Operacion_objtab OF Operacion_objtyp(
 */
 
 /**Tipo INVERSION**/
+/
 CREATE TYPE Inversion_objtyp UNDER Operacion_objtyp(
 	nombre_fondo varchar(20),
 	riesgo varchar(20),
@@ -370,6 +371,7 @@ CREATE TYPE Inversion_objtyp UNDER Operacion_objtyp(
 	gerente REF Gerente_objtyp,
 	overriding member procedure print
 );
+/
 /**Funcion print**/
 create or replace type body Inversion_objtyp as 
 	
@@ -382,7 +384,7 @@ create or replace type body Inversion_objtyp as
 		DBMS_OUTPUT.NEW_LINE;
 	END print;
 END;
-
+/
 /**Tabla INVERSION**/
 CREATE TABLE Inversion_objtab OF Inversion_objtyp(
 	id PRIMARY KEY,
@@ -393,7 +395,7 @@ CREATE TABLE Inversion_objtab OF Inversion_objtyp(
 
 	SCOPE FOR(gerente) IS Gerente_objtab
 );
-
+/
 
 /**Tipo PRESTAMO**/
 CREATE TYPE Prestamo_objtyp UNDER Operacion_objtyp(
@@ -402,7 +404,7 @@ CREATE TYPE Prestamo_objtyp UNDER Operacion_objtyp(
 	empleado REF Empleado_objtyp,
 	overriding member procedure print
 );
-
+/
 /**Funcion print**/
 create or replace type body Prestamo_objtyp as 
 	
@@ -414,7 +416,7 @@ create or replace type body Prestamo_objtyp as
 		DBMS_OUTPUT.NEW_LINE;
 	END print;
 END;
-
+/
 /**Tabla PRESTAMO**/
 
 CREATE TABLE Prestamo_objtab OF Prestamo_objtyp(
@@ -423,7 +425,7 @@ CREATE TABLE Prestamo_objtab OF Prestamo_objtyp(
     check(plazo is not null),
     SCOPE FOR(empleado) IS Empleado_objtab
     );
-
+/
 
 
 
@@ -436,7 +438,7 @@ CREATE TYPE Transferencia_objtyp UNDER Operacion_objtyp(
 	overriding member procedure print
 
 );
-
+/
 /**Funcion print**/
 create or replace type body Transferencia_objtyp as 
 	
@@ -449,7 +451,7 @@ create or replace type body Transferencia_objtyp as
 		DBMS_OUTPUT.NEW_LINE;
 	END print;
 END;
-
+/
 /**Tabla TRANSFERENCIA**/
 CREATE TABLE Transferencia_objtab OF Transferencia_objtyp(
 	id PRIMARY KEY,
@@ -461,7 +463,7 @@ CREATE TABLE Transferencia_objtab OF Transferencia_objtyp(
 
 
 );
-
+/
 /**Tipo MOVIMIENTO TARJETA**/
 CREATE TYPE MovimientoTarjeta_objtyp AS OBJECT(
 	numero_movt varchar(20),
@@ -474,7 +476,7 @@ CREATE TYPE MovimientoTarjeta_objtyp AS OBJECT(
 	member procedure print,
 	member function ordenar (v_movimientoT in MovimientoTarjeta_objtyp) return integer
 );
-
+/
 /**Funcion getNumeroMovt, print, ordenar**/
 create or replace type body MovimientoTarjeta_objtyp as 
 	map member function get_numero_movt return CHAR is
@@ -503,7 +505,7 @@ create or replace type body MovimientoTarjeta_objtyp as
 	end if;
 	END;
 END;
-
+/
 
 
 
@@ -523,14 +525,14 @@ create or replace TYPE Movimiento_objtyp AS OBJECT(
 	member function ordenar (v_movimientos in Movimiento_objtyp) return integer
 
 );
-
+/
 
 /**Tabla anidada para TARJETA**/
 CREATE TYPE Movimientotarjeta_ntabtyp AS TABLE OF Movimientotarjeta_objtyp;
-
+/
 /**Tabla anidada para CUENTA**/
 CREATE TYPE Movimiento_ntabtyp AS TABLE OF Movimiento_objtyp;
-
+/
 /**Funcion getNumeroMov, print, ordenar**/
 create or replace type body Movimiento_objtyp as 
 	map member function get_numero_mov return CHAR is
@@ -562,7 +564,7 @@ create or replace type body Movimiento_objtyp as
 	end if;
 	END;
 END;
-
+/
 /*
 Tabla MOVIMIENTO
 CREATE TABLE Movimiento_objtab OF Movimiento_objtyp(
@@ -579,10 +581,10 @@ CREATE TABLE Movimiento_objtab OF Movimiento_objtyp(
 	SCOPE FOR(tipo_inv) IS Inversion_objtab
 );
 */
-
+/
 /**Tabla anidada para CUENTA**/
 CREATE TYPE Cliente_ntabtyp AS TABLE OF REF Cliente_objtyp;
-
+/
 create or replace TYPE Cuenta_objtyp AS OBJECT (
 	numCuenta number(20),
 	fecha_Contrato date,
@@ -595,7 +597,7 @@ create or replace TYPE Cuenta_objtyp AS OBJECT (
 	member function ordenar (v_cuenta in Cuenta_objtyp) return integer
 
 );
-
+/
 /**Funcion getNumCuenta, ordenar, print**/
 create or replace type body Cuenta_objtyp as 
 	map member function get_numCuenta return CHAR is
@@ -623,7 +625,7 @@ create or replace type body Cuenta_objtyp as
 	END;
 	
 END;
-
+/
 /**Tabla CUENTA**/
 CREATE TABLE Cuenta_objtab OF Cuenta_objtyp(
 	numCuenta PRIMARY KEY,
@@ -645,7 +647,7 @@ NESTED TABLE movimientos STORE AS Movimiento_ntab(
 ));
 
 
-
+/
 
 /**Tipo TARJETA**/
 CREATE TYPE Tarjeta_objtyp AS OBJECT(
@@ -660,6 +662,7 @@ CREATE TYPE Tarjeta_objtyp AS OBJECT(
 	member function ordenar (v_tarjeta in Tarjeta_objtyp) return integer
 
 );
+/
 /**Funcion getNumTarjeta, print, ordenar**/
 create or replace type body Tarjeta_objtyp as 
 	map member function get_numTarjeta return CHAR is
@@ -688,7 +691,7 @@ create or replace type body Tarjeta_objtyp as
 	end if;
 	END;
 END;
-
+/
 /**Tabla TARJETA**/
 CREATE TABLE Tarjeta_objtab OF Tarjeta_objtyp(
 	numTarjeta PRIMARY KEY,
@@ -708,15 +711,18 @@ CREATE TABLE Tarjeta_objtab OF Tarjeta_objtyp(
 	)
 );
 
-
+/
 
 
 
 
 
 ALTER TABLE movimiento_ntab ADD (SCOPE FOR (tipo_trans) IS transferencia_objtab);
+/
 ALTER TABLE movimiento_ntab ADD (SCOPE FOR (tipo_pres1) IS prestamo_objtab);
+/
 ALTER TABLE movimiento_ntab ADD (SCOPE FOR (tipo_pres2) IS prestamo_objtab);
+/
 ALTER TABLE movimiento_ntab ADD (SCOPE FOR (tipo_inv) IS inversion_objtab);
 
 
@@ -725,5 +731,6 @@ ALTER TABLE movimiento_ntab ADD (SCOPE FOR (tipo_inv) IS inversion_objtab);
 
 /**SIN PONER**/
 
-/**Tabla anidada para**/
+/**Tabla anidada para transferencias**/
+/
 CREATE TYPE Cuenta_ntabtyp AS TABLE OF REF Cuenta_objtyp;

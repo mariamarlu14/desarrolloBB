@@ -41,3 +41,84 @@ EXCEPTION
         RETURN 0;
 
 END;
+
+create or replace FUNCTION totalprestamosTurno (
+    nomTurno IN empleado_objtab.turno%TYPE,
+    nomFinalidad IN prestamo_objtab.finalidad%TYPE
+
+) RETURN NUMBER IS
+    empleadoR ref empleado_objtyp;
+    saldoOp prestamo_objtab.saldo_op%type;
+    total NUMBER;
+    vturno empleado_objtab.turno%TYPE;
+BEGIN
+    total:=0;
+  select empleado, saldo_op into empleadoR, saldoOp from prestamo_objtab where finalidad=nomFinalidad;
+
+   select turno into vturno from empleado_objtab e where ref(e)= empleadoR;
+       
+
+  if vturno = nomTurno then
+       
+    total:= total+saldoOp;
+   end if;
+              dbms_output.put_line('Total' || total);
+
+
+    RETURN total;
+EXCEPTION
+    WHEN OTHERS THEN
+        dbms_output.put_line('No existe la finalidad');
+        RETURN 0;
+
+END;
+
+DECLARE
+  NOMTURNO VARCHAR2(20);
+  NOMFINALIDAD VARCHAR2(40);
+  v_Return NUMBER;
+BEGIN
+  NOMTURNO := 'TARDE';
+  NOMFINALIDAD := 'hipoteca';
+
+  v_Return := TOTALPRESTAMOSTURNO(
+    NOMTURNO => NOMTURNO,
+    NOMFINALIDAD => NOMFINALIDAD
+  );
+  /* Legacy output: 
+DBMS_OUTPUT.PUT_LINE('v_Return = ' || v_Return);
+*/ 
+  :v_Return := v_Return;
+--rollback; 
+END;
+
+
+create or replace FUNCTION totalprestamosTurno (
+    nomTurno IN empleado_objtab.turno%TYPE,
+    nomFinalidad IN prestamo_objtab.finalidad%TYPE
+
+) RETURN NUMBER IS
+    empleadoR ref empleado_objtyp;
+    saldoOp prestamo_objtab.saldo_op%type;
+    total NUMBER;
+    vturno empleado_objtab.turno%TYPE;
+BEGIN
+    total:=0;
+  select empleado, saldo_op into empleadoR, saldoOp from prestamo_objtab where finalidad=nomFinalidad;
+
+   select turno into vturno from empleado_objtab e where ref(e)= empleadoR;
+       
+
+  if vturno = nomTurno then
+       
+    total:= total+saldoOp;
+   end if;
+              dbms_output.put_line('Total' || total);
+
+    RETURN total;
+EXCEPTION
+    WHEN OTHERS THEN
+        dbms_output.put_line('No existe la finalidad');
+        RETURN 0;
+
+END;

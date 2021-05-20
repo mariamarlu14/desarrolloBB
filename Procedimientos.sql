@@ -379,3 +379,72 @@ FOR I IN (SELECT numTarjeta numT FROM tarjeta_objtab P) LOOP
           
 end loop;
  end;
+
+
+
+
+ create or replace NONEDITIONABLE procedure insercionDeMovimientoTarjetaCredito as
+tarjeta tarjeta_objtyp;
+nt tarjeta_objtab.numTarjeta%type;
+tipoT tarjeta_objtab.tipo%type;
+nC cuenta_objtab.numCuenta%type;
+saldocuenta   cuenta_objtab.saldo%TYPE;
+sal           NUMBER(12, 2);
+
+mov movimientotarjeta_ntabtyp;
+cuenta ref cuenta_objtyp;
+cargo number(12, 2);
+ begin
+ /*select numcuenta BULK COLLECT INTO TPROF from cuenta_objtab;*/
+FOR I IN (SELECT numTarjeta numT FROM tarjeta_objtab P) LOOP
+
+
+         select tipo into tipoT from Tarjeta_objtab where numTarjeta=i.numT;
+
+        if tipoT='CREDITO' THEN
+         select movimientos into mov from Tarjeta_objtab where numTarjeta=i.numT;
+         select cuenta into cuenta from Tarjeta_objtab where numTarjeta=i.numT;
+            FOR j IN mov.FIRST..mov.LAST LOOP
+                if mov(j).pasada ='NO' then
+
+                         select numCuenta into nC from cuenta_objtab e where ref(e)=cuenta;
+
+
+       SELECT g.saldo INTO  saldocuenta FROM cuenta_objtab g  WHERE  numCuenta = nC;
+
+         sal := saldocuenta - mov(j).cargo;
+
+            INSERT INTO TABLE 
+            (SELECT Movimientos FROM cuenta_objtab WHERE numcuenta = nC)
+                VALUES (movimientoTarjeta_idmovimientoTarjeta_seq.nextval, mov(j).fecha_hora , 'TARJETA', mov(j).cargo, sal,NULL,NULL,NULL,NULL);
+        
+
+        UPDATE cuenta_objtab SET saldo = sal  WHERE numCuenta = nC;
+
+        
+                 end if;
+
+                       UPDATE TABLE (SELECT Movimientos FROM tarjeta_objtab WHERE numTarjeta = i.numT and tipo='CREDITO')
+          SET pasada = 'YES';
+            end loop;
+    end if;
+end loop;
+         DBMS_OUTPUT.PUT_LINE('Se han pasado los movimientos de la tarjeta de credito correctamente');
+
+ end;
+
+
+ begin
+dbms_scheduler.create_job (  
+ job_name            => 'JOB_TEST2',  
+ job_type            => 'STORED_PROCEDURE',  
+ job_action          => 'inserciondeTransferenciasTarjetaCredito',  
+ number_of_arguments => 0,  
+ start_date          => sysdate,
+ end_date            => sysdate + 1,
+ repeat_interval     => 'FREQ=HOURLY;byminute=0',
+ job_class           => 'DEFAULT_JOB_CLASS',  -- Priority Group  
+ enabled             => TRUE,  
+ auto_drop           => TRUE,  
+ comments            => 'JOB de prueba');
+end;
